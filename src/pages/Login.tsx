@@ -108,7 +108,7 @@ export default function Login() {
       <div className="hidden lg:block relative flex-1">
         <img
           className="absolute inset-0 h-full w-full object-cover"
-          src="./public/shop-keeper.jpg"
+          src="/shop-keeper.jpg"
           alt="Market scene"
         />
       </div>

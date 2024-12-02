@@ -112,7 +112,7 @@ export default function SignUp() {
       <div className="hidden lg:block relative flex-1">
         <img
           className="absolute inset-0 h-full w-full object-cover"
-          src="./public/mama-mboga.jpg"
+          src="/mama-mboga.jpg"
           alt="Market scene"
         />
       </div>
