@@ -1,5 +1,4 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Package,
@@ -11,6 +10,7 @@ import {
   Settings,
   LogOut
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const navigation = [
   { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
@@ -24,6 +24,18 @@ const navigation = [
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      logout();
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
   return (
     <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
       <div className="flex flex-col flex-grow bg-[#011627] overflow-y-auto">
@@ -46,6 +58,7 @@ export default function Sidebar() {
           <div className="mt-6 pt-6">
             <div className="px-2 space-y-1">
               <button
+                onClick={handleLogout}
                 className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-[#FDFFFC] hover:bg-[#E71D36] hover:text-white w-full"
               >
                 <LogOut className="mr-4 flex-shrink-0 h-6 w-6" />
