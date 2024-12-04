@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login, error } = useAuth();
 
@@ -28,13 +30,13 @@ export default function Login() {
           <div>
             <Link to="/" className="flex items-center text-[#011627] hover:text-[#2EC4B6] mb-8">
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Home
+              {t('auth.backToHome')}
             </Link>
-            <h2 className="mt-6 text-3xl font-bold text-[#011627]">Welcome back</h2>
+            <h2 className="mt-6 text-3xl font-bold text-[#011627]">{t('auth.login.title')}</h2>
             <p className="mt-2 text-sm text-[#011627]/70">
-              Don't have an account?{' '}
+              {t('auth.login.noAccount')}{' '}
               <Link to="/signup" className="text-[#2EC4B6] hover:text-[#E71D36]">
-                Sign up
+              {t('auth.login.signUpLink')}
               </Link>
             </p>
           </div>
@@ -49,7 +51,7 @@ export default function Login() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-[#011627]">
-                  Email address
+                {t('auth.email')}
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -60,7 +62,7 @@ export default function Login() {
                     type="email"
                     required
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-                    placeholder="you@example.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -69,7 +71,7 @@ export default function Login() {
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-[#011627]">
-                  Password
+                {t('auth.password')}
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -80,7 +82,7 @@ export default function Login() {
                     type="password"
                     required
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -96,13 +98,13 @@ export default function Login() {
                   className="h-4 w-4 text-[#2EC4B6] focus:ring-[#2EC4B6] border-gray-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-[#011627]">
-                  Remember me
+                {t('auth.login.rememberMe')}
                 </label>
               </div>
 
               <div className="text-sm">
                 <a href="#" className="text-[#2EC4B6] hover:text-[#E71D36]">
-                  Forgot your password?
+                {t('auth.login.forgotPassword')}
                 </a>
               </div>
             </div>
@@ -111,7 +113,7 @@ export default function Login() {
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#E71D36] hover:bg-[#c91126] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6]"
             >
-              Sign in
+              {t('auth.login.submit')}
             </button>
           </form>
         </div>
@@ -122,7 +124,7 @@ export default function Login() {
         <img
           className="absolute inset-0 h-full w-full object-cover"
           src="/shop-keeper.jpg"
-          alt="Market scene"
+          alt={t('auth.login.imageAlt')}
         />
       </div>
     </div>

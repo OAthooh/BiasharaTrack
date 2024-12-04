@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { register, error } = useAuth();
 
@@ -29,13 +31,13 @@ export default function SignUp() {
           <div>
             <Link to="/" className="flex items-center text-[#011627] hover:text-[#2EC4B6] mb-8">
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Home
+              {t('auth.backToHome')}
             </Link>
-            <h2 className="mt-6 text-3xl font-bold text-[#011627]">Create your account</h2>
+            <h2 className="mt-6 text-3xl font-bold text-[#011627]">{t('auth.signup.title')}</h2>
             <p className="mt-2 text-sm text-[#011627]/70">
-              Already have an account?{' '}
+            {t('auth.signup.haveAccount')}{' '}
               <Link to="/login" className="text-[#2EC4B6] hover:text-[#E71D36]">
-                Sign in
+              {t('auth.signup.loginLink')}
               </Link>
             </p>
           </div>
@@ -50,7 +52,7 @@ export default function SignUp() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-[#011627]">
-                  Full Name
+                {t('auth.fullName')}
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -61,7 +63,7 @@ export default function SignUp() {
                     type="text"
                     required
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-                    placeholder="John Doe"
+                    placeholder={t('auth.fullNamePlaceholder')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -70,7 +72,7 @@ export default function SignUp() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-[#011627]">
-                  Email address
+                {t('auth.email')}
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -81,7 +83,7 @@ export default function SignUp() {
                     type="email"
                     required
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-                    placeholder="you@example.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -90,7 +92,7 @@ export default function SignUp() {
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-[#011627]">
-                  Password
+                  {t('auth.password')}
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -101,7 +103,7 @@ export default function SignUp() {
                     type="password"
                     required
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -114,7 +116,7 @@ export default function SignUp() {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#E71D36] hover:bg-[#c91126] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EC4B6]"
               >
-                Create account
+                {t('auth.signup.submit')}
               </button>
             </div>
           </form>
@@ -126,7 +128,7 @@ export default function SignUp() {
         <img
           className="absolute inset-0 h-full w-full object-cover"
           src="/mama-mboga.jpg"
-          alt="Market scene"
+          alt={t('auth.signup.imageAlt')}
         />
       </div>
     </div>
