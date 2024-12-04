@@ -1,0 +1,98 @@
+{
+  "hero": {
+    "title": "Kuwezesha Wafanyabiashara wa Kenya na Zana Bora za Kibiashara",
+    "subtitle": "Boresha biashara yako na suluhisho letu kamili la usimamizi wa bidhaa, ufuatiliaji wa mauzo, na ufahamu wa kifedha.",
+    "cta": "Anza Sasa"
+  },
+  "features": {
+    "title": "Vipengele Vinavyoimarisha Biashara Yako",
+    "subtitle": "Kila unachohitaji kusimamia biashara yako kwa ufanisi",
+    "items": {
+      "inventory": {
+        "title": "Usimamizi wa Bidhaa",
+        "description": "Ufuatiliaji rahisi wa bidhaa kwa kutumia picha na skana ya msimbo."
+      },
+      "sales": {
+        "title": "Kurekodi Mauzo",
+        "description": "Muunganisho rahisi wa M-PESA na risiti za kidijitali kwa kila muamala."
+      },
+      "accounting": {
+        "title": "Uhasibu wa Msingi",
+        "description": "Fuatilia faida, hasara, na matumizi kwa ripoti rahisi kuelewa."
+      },
+      "multilingual": {
+        "title": "Msaada wa Lugha Nyingi",
+        "description": "Tumia programu kwa Kiswahili, Kiingereza, au lugha yako unayopendelea."
+      },
+      "offline": {
+        "title": "Hali ya Nje ya Mtandao",
+        "description": "Endelea kufanya kazi hata bila mtandao - data yako itasawazishwa ukiwa mtandaoni."
+      },
+      "analytics": {
+        "title": "Uchanganuzi Bora",
+        "description": "Pata ufahamu wa mienendo ya msimu na mapendekezo ya kujaza bidhaa."
+      }
+    }
+  },
+  "impact": {
+    "title": "Kuleta Mabadiliko ya Kweli",
+    "subtitle": "Sikia kutoka kwa wafanyabiashara walioibadilisha biashara yao",
+    "testimonials": {
+      "testimonial1": {
+        "quote": "BiasharaTrack imebadilisha jinsi ninavyosimamia duka langu. Muunganisho wa M-PESA unaokoa muda wangu sana!",
+        "author": "Sarah Mwangi",
+        "business": "Mmiliki wa Duka la Vyakula, Nairobi"
+      },
+      "testimonial2": {
+        "quote": "Kuweza kutumia programu kwa Kiswahili kumefanya iwe rahisi sana kwangu kufuatilia bidhaa na mauzo yangu.",
+        "author": "John Kamau",
+        "business": "Mmiliki wa Duka la Vifaa, Mombasa"
+      }
+    }
+  },
+  "cta": {
+    "title": "Jiunge na Harakati za Kubadilisha Biashara Yako!",
+    "subtitle": "Anza kusimamia biashara yako kwa ubora zaidi na BiasharaTrack",
+    "button": "Jiandikishe Sasa"
+  },
+  "footer": {
+    "tagline": "Kuwasaidia wafanyabiashara kwa zana bora za kibiashara",
+    "quickLinks": "Viungo vya Haraka",
+    "support": "Msaada",
+    "connect": "Tuunganishe",
+    "rights": "Haki zote zimehifadhiwa.",
+    "links": {
+      "about": "Kuhusu Sisi",
+      "features": "Vipengele",
+      "pricing": "Bei",
+      "help": "Kituo cha Msaada",
+      "contact": "Wasiliana Nasi",
+      "privacy": "Sera ya Faragha"
+    }
+  },
+  "auth": {
+    "backToHome": "Rudi Nyumbani",
+    "email": "Anwani ya barua pepe",
+    "emailPlaceholder": "wewe@mfano.com",
+    "password": "Nywila",
+    "passwordPlaceholder": "••••••••",
+    "fullName": "Jina Kamili",
+    "fullNamePlaceholder": "John Doe",
+    "login": {
+      "title": "Karibu tena",
+      "noAccount": "Huna akaunti?",
+      "signUpLink": "Jisajili",
+      "rememberMe": "Nikumbuke",
+      "forgotPassword": "Umesahau nywila?",
+      "submit": "Ingia",
+      "imageAlt": "Mandhari ya Soko la Kenya"
+    },
+    "signup": {
+      "title": "Tengeneza akaunti yako",
+      "haveAccount": "Una akaunti tayari?",
+      "loginLink": "Ingia",
+      "submit": "Tengeneza akaunti",
+      "imageAlt": "Muuzaji wa Soko la Kenya"
+    }
+  }
+}
