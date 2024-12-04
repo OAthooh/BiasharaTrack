@@ -6,8 +6,8 @@ import (
 
 	"github.com/OAthooh/BiasharaTrack.git/database"
 	"github.com/OAthooh/BiasharaTrack.git/routes"
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -25,8 +25,11 @@ func main() {
 
 	// Run database migrations
 	fmt.Println("Running database migrations...")
-	db.Migrate()
-
+	err = db.Migrate()
+	if err != nil {
+		log.Fatalf("Failed to migrate database: %v", err)
+	}
+	fmt.Println("Database migrations completed successfully")
 	// Initialize Gin router with default middleware
 	fmt.Println("Initializing Gin router...")
 	router := gin.Default()
@@ -41,9 +44,8 @@ func main() {
 	fmt.Println("Gin router initialized successfully")
 
 	// Register authentication routes
-	fmt.Println("Registering authentication routes...")
 	routes.AuthRoutes(router, db.DB)
-	fmt.Println("Authentication routes registered successfully")
+	routes.InventoryManagementRoutes(router, db.DB)
 
 	fmt.Println("Server is running on port 8080")
 	// Start server on port 8080
