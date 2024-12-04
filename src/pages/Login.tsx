@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -9,7 +9,13 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login, error } = useAuth();
+  const { login, error, isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +27,14 @@ export default function Login() {
       console.error('Login failed:', err);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFFFC] flex">
