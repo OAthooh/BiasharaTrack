@@ -3,7 +3,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
-import ProtectedRoute from './context/ProtectedRoute';
+import InventoryManagement from './pages/inventory/InventoryManagement';
 import FloatingLanguageSwitcher from './components/FloatingLanguageSwitcher';
 
 function App() {
@@ -11,17 +11,11 @@ function App() {
     <Router>
       <FloatingLanguageSwitcher />
       <Routes>
-        <Route path="/" element={<Home /> } />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/inventory" element={<InventoryManagement />} />
       </Routes>
     </Router>
   );
