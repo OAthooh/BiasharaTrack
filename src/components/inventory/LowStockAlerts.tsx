@@ -14,39 +14,24 @@ export default function LowStockAlerts() {
 
   useEffect(() => {
     const fetchAlerts = async () => {
+      console.log("fetching alerts");
       try {
+        setLoading(true);
         const response = await inventoryApi.getLowStockAlerts();
-        if (!response.success) {
-          throw new Error(response.error);
-        }
-        console.log("response.data", response.data);
-        setAlerts(Array.isArray(response.data) ? response.data : []);
-        
-        // Show toast notifications for unresolved alerts
-        if (Array.isArray(response.data)) {
-          response.data.filter(alert => !alert.resolved)
-            .forEach(alert => {
-              toast.warning(
-                <div className="flex items-center">
-                  <span className="font-medium">{alert.product_name}</span>
-                  <span className="ml-2">- {alert.alert_message}</span>
-                </div>,
-                {
-                  position: "top-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  className: "rounded-lg"
-                }
-              );
-            });
+        console.log("response",response);
+        if (response.success && Array.isArray(response.data)) {
+          console.log("response.data", response.data);
+          setAlerts(response.data);
+          
+          response.data.forEach(alert => {
+            if (!alert.resolved) {
+              toast.warning(alert.alert_message);
+            }
+          });
         }
       } catch (error) {
-        toast.error('Failed to fetch alerts');
         console.error('Error fetching alerts:', error);
+        toast.error('Failed to fetch stock alerts');
       } finally {
         setLoading(false);
       }
@@ -55,12 +40,12 @@ export default function LowStockAlerts() {
     fetchAlerts();
   }, []);
 
-  const filteredAlerts = alerts.filter((alert) => {
+  const filteredAlerts = Array.isArray(alerts) ? alerts.filter((alert) => {
     const matchesSearch = alert.product_name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || 
       (statusFilter === 'resolved' ? alert.resolved : !alert.resolved);
     return matchesSearch && matchesStatus;
-  });
+  }) : [];
 
   const handleExport = () => {
     const csv = [
