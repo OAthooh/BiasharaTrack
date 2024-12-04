@@ -35,7 +35,6 @@ export default function Sidebar() {
       console.error('Logout failed:', err);
     }
   };
-
   return (
     <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
       <div className="flex flex-col flex-grow bg-[#011627] overflow-y-auto">
@@ -48,7 +47,9 @@ export default function Sidebar() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-[#FDFFFC] hover:bg-[#2EC4B6] hover:text-white"
+                className={`group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-[#FDFFFC] hover:bg-[#2EC4B6] hover:text-white ${
+                  location.pathname === item.href ? 'bg-[#2EC4B6]' : ''
+                }`}
               >
                 <item.icon className="mr-4 flex-shrink-0 h-6 w-6" />
                 {item.name}
@@ -58,7 +59,7 @@ export default function Sidebar() {
           <div className="mt-6 pt-6">
             <div className="px-2 space-y-1">
               <button
-                onClick={handleLogout}
+              onClick={handleLogout}
                 className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-[#FDFFFC] hover:bg-[#E71D36] hover:text-white w-full"
               >
                 <LogOut className="mr-4 flex-shrink-0 h-6 w-6" />
