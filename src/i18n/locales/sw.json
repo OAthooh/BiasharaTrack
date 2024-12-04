@@ -1,4 +1,25 @@
 {
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Dashibodi",
+      "inventory": "Bidhaa",
+      "sales": "Mauzo",
+      "analytics": "Uchambuzi",
+      "credit": "Mikopo",
+      "reports": "Ripoti",
+      "tutorials": "Mafunzo",
+      "settings": "Mipangilio",
+      "signOut": "Toka"
+    },
+    "search": {
+      "placeholder": "Tafuta",
+      "label": "Sehemu ya kutafuta",
+      "notifications": "Tazama arifa"
+    },
+    "sidebar": {
+      "openSidebar": "Fungua upau wa kando"
+    }
+  },
   "hero": {
     "title": "Kuwezesha Wafanyabiashara wa Kenya na Zana Bora za Kibiashara",
     "subtitle": "Boresha biashara yako na suluhisho letu kamili la usimamizi wa bidhaa, ufuatiliaji wa mauzo, na ufahamu wa kifedha.",
