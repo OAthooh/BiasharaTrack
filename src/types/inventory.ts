@@ -38,3 +38,8 @@ export interface ProductFormData {
   low_stock_threshold: string;
   photo_path: File | null;
 }
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+}
