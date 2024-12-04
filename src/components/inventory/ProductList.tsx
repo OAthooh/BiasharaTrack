@@ -147,7 +147,7 @@ export default function ProductList() {
                     <div className="h-10 w-10 flex-shrink-0">
                       <img
                         className="h-10 w-10 rounded-full object-cover"
-                        src={product.photo_path ? `http://localhost:8000${product.photo_path}` : 'http://localhost:8080/uploads/products/1733344473993716042_github-profile.png'}
+                        src={product.photo_path ? `http://localhost:8080${product.photo_path}` : 'http://localhost:8080/uploads/products/1733344473993716042_github-profile.png'}
                         alt={product.name}
                         onError={(e) => {
                           console.log('Image failed to load:', product.photo_path);
