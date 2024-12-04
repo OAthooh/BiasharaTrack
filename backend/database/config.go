@@ -14,7 +14,7 @@ type DB struct {
 
 func Connect() (*DB, error) {
 	// Ensure the directory exists
-	dbPath := "./backend/database/storage/"
+	dbPath := "./database/storage/"
 	if err := os.MkdirAll(dbPath, os.ModePerm); err != nil {
 		return nil, err
 	}
