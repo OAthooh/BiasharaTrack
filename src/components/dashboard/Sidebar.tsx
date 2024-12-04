@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   Package,
@@ -12,20 +13,21 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const navigation = [
-  { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-  { name: 'Inventory', icon: Package, href: '/dashboard/inventory' },
-  { name: 'Sales', icon: ShoppingCart, href: '/dashboard/sales' },
-  { name: 'Analytics', icon: BarChart2, href: '/dashboard/analytics' },
-  { name: 'Credit', icon: Users, href: '/dashboard/credit' },
-  { name: 'Reports', icon: FileText, href: '/dashboard/reports' },
-  { name: 'Tutorials', icon: Video, href: '/dashboard/tutorials' },
-  { name: 'Settings', icon: Settings, href: '/dashboard/settings' },
-];
-
 export default function Sidebar() {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { t } = useTranslation();
+
+  const navigation = [
+    { name: t('dashboard.navigation.dashboard'), icon: LayoutDashboard, href: '/dashboard' },
+    { name: t('dashboard.navigation.inventory'), icon: Package, href: '/dashboard/inventory' },
+    { name: t('dashboard.navigation.sales'), icon: ShoppingCart, href: '/dashboard/sales' },
+    { name: t('dashboard.navigation.analytics'), icon: BarChart2, href: '/dashboard/analytics' },
+    { name: t('dashboard.navigation.credit'), icon: Users, href: '/dashboard/credit' },
+    { name: t('dashboard.navigation.reports'), icon: FileText, href: '/dashboard/reports' },
+    { name: t('dashboard.navigation.tutorials'), icon: Video, href: '/dashboard/tutorials' },
+    { name: t('dashboard.navigation.settings'), icon: Settings, href: '/dashboard/settings' },
+  ];
 
   const handleLogout = async () => {
     try {
@@ -63,7 +65,7 @@ export default function Sidebar() {
                 className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-[#FDFFFC] hover:bg-[#E71D36] hover:text-white w-full"
               >
                 <LogOut className="mr-4 flex-shrink-0 h-6 w-6" />
-                Sign out
+                {t('dashboard.navigation.signOut')}
               </button>
             </div>
           </div>
