@@ -7,6 +7,8 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 )
 
+require github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
+
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
