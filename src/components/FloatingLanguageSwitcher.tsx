@@ -13,7 +13,7 @@ export default function FloatingLanguageSwitcher() {
   return (
     <button
       onClick={toggleLanguage}
-      className="fixed top-6 right-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-[#2EC4B6] text-white hover:bg-[#25a093] transition-colors shadow-lg"
+      className="fixed top-3 right-12 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-[#2EC4B6] text-white hover:bg-[#25a093] transition-colors shadow-lg"
       aria-label="Toggle language"
     >
       <Globe className="w-5 h-5" />
