@@ -179,6 +179,24 @@ func (im *InventoryManagementHandler) CreateProduct(c *gin.Context) {
 	}
 
 	product.ID = int(productID)
+	// Check if initial quantity is below threshold and create alert if needed
+	if quantity <= threshold {
+		_, err = im.db.Exec(`
+			INSERT INTO LowStockAlerts (
+				product_id, alert_message, resolved, created_at
+			) VALUES (?, ?, ?, ?)`,
+			productID,
+			fmt.Sprintf("Low stock alert for %s: %d units remaining (threshold: %d)",
+				product.Name, quantity, threshold),
+			false,
+			now,
+		)
+		if err != nil {
+			utils.ErrorLogger("Failed to create low stock alert: %v", err)
+			c.JSON(500, gin.H{"error": "Failed to create low stock alert"})
+			return
+		}
+	}
 
 	c.JSON(200, gin.H{
 		"success": true,
@@ -310,6 +328,31 @@ func (im *InventoryManagementHandler) UpdateProduct(c *gin.Context) {
 		utils.ErrorLogger("Failed to commit transaction for product update: %v", err)
 		c.JSON(500, gin.H{"error": "Failed to commit transaction"})
 		return
+	}
+	// Check if quantity is below threshold and create alert if needed
+	var currentQuantity, threshold int
+	err = im.db.QueryRow(`
+		SELECT quantity, low_stock_threshold 
+		FROM Inventory 
+		WHERE product_id = ?`, productID).Scan(&currentQuantity, &threshold)
+	if err != nil && err != sql.ErrNoRows {
+		utils.ErrorLogger("Failed to check inventory levels for product %d: %v", productID, err)
+	} else if err == nil && currentQuantity <= threshold {
+		// Get product name for alert message
+		var productName string
+		err = im.db.QueryRow("SELECT name FROM Products WHERE id = ?", productID).Scan(&productName)
+		if err == nil {
+			alertMsg := fmt.Sprintf("Low stock alert for %s: Current quantity (%d) is at or below threshold (%d)",
+				productName, currentQuantity, threshold)
+
+			_, err = im.db.Exec(`
+				INSERT INTO LowStockAlerts (product_id, alert_message, resolved, created_at)
+				VALUES (?, ?, false, CURRENT_TIMESTAMP)`,
+				productID, alertMsg)
+			if err != nil {
+				utils.ErrorLogger("Failed to create low stock alert for product %d: %v", productID, err)
+			}
+		}
 	}
 
 	utils.InfoLogger("Successfully updated product %d", productID)
@@ -572,14 +615,7 @@ func isAllowedImageType(file multipart.File) bool {
 }
 
 func (im *InventoryManagementHandler) GetLowStockAlerts(c *gin.Context) {
-	// Check and create low stock alerts if needed
-	// err := im.CheckAndCreateLowStockAlerts()
-	// if err != nil {
-	// 	utils.ErrorLogger("Failed to check and create low stock alerts: %v", err)
-	// 	c.JSON(500, gin.H{"error": "Failed to check and create low stock alerts"})
-	// 	return
-	// }
-
+	
 	// Query to get low stock alerts with product details
 	rows, err := im.db.Query(`
 		SELECT 
@@ -640,79 +676,5 @@ func (im *InventoryManagementHandler) GetLowStockAlerts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"success": true,
-		"data":    alerts,
-	})
-}
-
-func (im *InventoryManagementHandler) CheckAndCreateLowStockAlerts() error {
-	// Add a small delay to prevent database locks
-	time.Sleep(100 * time.Millisecond)
-	// Query to get products with quantity below threshold
-	query := `
-		SELECT p.id, p.name, i.quantity, i.low_stock_threshold 
-		FROM products p
-		JOIN inventory i ON p.id = i.product_id
-		WHERE i.quantity <= i.low_stock_threshold
-		AND NOT EXISTS (
-			SELECT 1 FROM LowStockAlerts lsa 
-			WHERE lsa.product_id = p.id 
-			AND lsa.resolved = false
-		)`
-
-	rows, err := im.db.Query(query)
-	if err != nil {
-		utils.ErrorLogger("Failed to check for low stock products: %v", err)
-		return fmt.Errorf("failed to check inventory: %v", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var (
-			productID      int
-			productName    string
-			quantity       int
-			stockThreshold int
-		)
-
-		err := rows.Scan(&productID, &productName, &quantity, &stockThreshold)
-		if err != nil {
-			utils.ErrorLogger("Error scanning product row: %v", err)
-			continue
-		}
-
-		// Update existing alert or create new one
-		updateQuery := `
-			UPDATE LowStockAlerts 
-			SET alert_message = ?, resolved = false, created_at = CURRENT_TIMESTAMP
-			WHERE product_id = ? AND resolved = false
-			RETURNING id, created_at`
-
-		alertMessage := fmt.Sprintf("Low stock alert: %s has %d units remaining (threshold: %d)",
-			productName, quantity, stockThreshold)
-
-		var alertID int
-		var createdAt time.Time
-		err = im.db.QueryRow(updateQuery, alertMessage, productID).Scan(&alertID, &createdAt)
-
-		if err == sql.ErrNoRows {
-			// No existing alert found, create new one
-			insertQuery := `
-				INSERT INTO LowStockAlerts (product_id, alert_message, resolved, created_at)
-				VALUES (?, ?, false, CURRENT_TIMESTAMP)
-				RETURNING id, created_at`
-
-			err = im.db.QueryRow(insertQuery, productID, alertMessage).Scan(&alertID, &createdAt)
-			if err != nil {
-				utils.ErrorLogger("Failed to create low stock alert for product %d: %v", productID, err)
-				continue
-			}
-		} else if err != nil {
-			utils.ErrorLogger("Failed to update low stock alert for product %d: %v", productID, err)
-			continue
-		}
-
-	}
-	return nil
+	c.JSON(200, alerts)
 }
