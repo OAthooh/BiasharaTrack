@@ -1,0 +1,98 @@
+{
+  "hero": {
+    "title": "Empowering Kenya's Informal Traders with Smart Business Tools",
+    "subtitle": "Transform your business with our all-in-one solution for inventory management, sales tracking, and financial insights.",
+    "cta": "Get Started"
+  },
+  "features": {
+    "title": "Features That Empower Your Business",
+    "subtitle": "Everything you need to manage your business efficiently",
+    "items": {
+      "inventory": {
+        "title": "Inventory Management",
+        "description": "Simplified tracking with photo-based product entry and barcode scanning."
+      },
+      "sales": {
+        "title": "Sales Recording",
+        "description": "Seamless M-PESA integration and digital receipts for every transaction."
+      },
+      "accounting": {
+        "title": "Basic Accounting",
+        "description": "Track profits, losses, and expenses with easy-to-understand reports."
+      },
+      "multilingual": {
+        "title": "Multilingual Support",
+        "description": "Use the app in Kiswahili, English, or your preferred local language."
+      },
+      "offline": {
+        "title": "Offline Mode",
+        "description": "Keep working even without internet - your data syncs when you are back online."
+      },
+      "analytics": {
+        "title": "Smart Analytics",
+        "description": "Get insights on seasonal trends and automated reorder suggestions."
+      }
+    }
+  },
+  "impact": {
+    "title": "Making a Real Impact",
+    "subtitle": "Hear from traders who have transformed their businesses",
+    "testimonials": {
+      "testimonial1": {
+        "quote": "BiasharaTrack has transformed how I manage my shop. The M-PESA integration saves me so much time!",
+        "author": "Sarah Mwangi",
+        "business": "Grocery Store Owner, Nairobi"
+      },
+      "testimonial2": {
+        "quote": "Being able to use the app in Kiswahili has made it so easy for me to track my inventory and sales.",
+        "author": "John Kamau",
+        "business": "Hardware Store Owner, Mombasa"
+      }
+    }
+  },
+  "cta": {
+    "title": "Join the Movement to Revolutionize Your Business!",
+    "subtitle": "Start managing your business smarter today with BiasharaTrack",
+    "button": "Sign Up Now"
+  },
+  "footer": {
+    "tagline": "Empowering traders with smart business tools",
+    "quickLinks": "Quick Links",
+    "support": "Support",
+    "connect": "Connect With Us",
+    "rights": "All rights reserved.",
+    "links": {
+      "about": "About Us",
+      "features": "Features",
+      "pricing": "Pricing",
+      "help": "Help Center",
+      "contact": "Contact Us",
+      "privacy": "Privacy Policy"
+    }
+  },
+  "auth": {
+    "backToHome": "Back to Home",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "login": {
+      "title": "Welcome back",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Sign in",
+      "imageAlt": "Kenyan Market Scene"
+    },
+    "signup": {
+      "title": "Create your account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "submit": "Create account",
+      "imageAlt": "Kenyan Market Vendor"
+    }
+  }
+}
