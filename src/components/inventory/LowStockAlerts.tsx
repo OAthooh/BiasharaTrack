@@ -83,7 +83,7 @@ export default function LowStockAlerts() {
       
       <div className={`
         bg-white rounded-lg shadow p-4 md:p-6
-        w-full md:w-[400px] lg:w-[500px] xl:w-[600px] 2xl:w-[700px]
+        w-full md:w-[400px] lg:w-[500px] xl:w-[500px] 2xl:w-[600px]
         md:absolute md:right-6 md:top-26
         mt-4 md:mt-0
         max-h-[calc(100vh-120px)] overflow-y-auto
