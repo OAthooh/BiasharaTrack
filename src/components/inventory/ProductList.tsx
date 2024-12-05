@@ -17,9 +17,16 @@ export default function ProductList() {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("fetching products");
       try {
         const response = await inventoryApi.getAllProducts();
-        if (response.success && response.data) {
+        console.log("response", response);
+        if (response.success) {
+          if (!response.data || response.data.length === 0) {
+            setProducts([]);
+            setLoading(false);
+            return;
+          }
           const formattedProducts = response.data.map(item => ({
             ...item.product,
             quantity: item.quantity,
@@ -132,81 +139,83 @@ export default function ProductList() {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredProducts.map((product) => (
-              <tr
-                key={product.id}
-                className={
-                  product.quantity === 0
-                    ? 'bg-red-50'
-                    : product.quantity <= product.low_stock_threshold
-                    ? 'bg-yellow-50'
-                    : ''
-                }
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0">
-                      <img
-                        className="h-10 w-10 rounded-full object-cover"
-                        src={product.photo_path ? `http://localhost:8080${product.photo_path}` : 'http://localhost:8080/uploads/products/1733344473993716042_github-profile.png'}
-                        alt={product.name}
-                        onError={(e) => {
-                          console.log('Image failed to load:', product.photo_path);
-                          (e.target as HTMLImageElement).src = 'http://localhost:8080/uploads/products/1733344473993716042_github-profile.png';
-                        }}
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {product.name}
+          {products.length > 0 && (
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredProducts.map((product) => (
+                <tr
+                  key={product.id}
+                  className={
+                    product.quantity === 0
+                      ? 'bg-red-50'
+                      : product.quantity <= product.low_stock_threshold
+                      ? 'bg-yellow-50'
+                      : ''
+                  }
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 flex-shrink-0">
+                        <img
+                          className="h-10 w-10 rounded-full object-cover"
+                          src={product.photo_path ? `http://localhost:8080${product.photo_path}` : 'http://localhost:8080/uploads/products/1733344473993716042_github-profile.png'}
+                          alt={product.name}
+                          onError={(e) => {
+                            console.log('Image failed to load:', product.photo_path);
+                            (e.target as HTMLImageElement).src = 'http://localhost:8080/uploads/products/1733344473993716042_github-profile.png';
+                          }}
+                        />
                       </div>
-                      <div className="text-sm text-gray-500">{product.barcode}</div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {product.name}
+                        </div>
+                        <div className="text-sm text-gray-500">{product.barcode}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    {product.category}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{product.quantity}</div>
-                  <div className="text-xs text-gray-500">
-                  {t('inventory.productList.minimum')}: {product.low_stock_threshold}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatCurrency(product.price)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(product.updated_at)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      className="text-[#2EC4B6] hover:text-[#28b0a3]"
-                      title={t('inventory.productList.actions.view')}
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
-                    <button
-                      className="text-[#FF9F1C] hover:text-[#f39200]"
-                      title={t('inventory.productList.actions.title')}
-                    >
-                      <Edit2 className="w-5 h-5" />
-                    </button>
-                    <button
-                      className="text-[#E71D36] hover:text-[#c91126]"
-                      title={t('inventory.productList.actions.delete')}
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      {product.category}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{product.quantity}</div>
+                    <div className="text-xs text-gray-500">
+                    {t('inventory.productList.minimum')}: {product.low_stock_threshold}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {formatCurrency(product.price)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(product.updated_at)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        className="text-[#2EC4B6] hover:text-[#28b0a3]"
+                        title={t('inventory.productList.actions.view')}
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+                      <button
+                        className="text-[#FF9F1C] hover:text-[#f39200]"
+                        title={t('inventory.productList.actions.title')}
+                      >
+                        <Edit2 className="w-5 h-5" />
+                      </button>
+                      <button
+                        className="text-[#E71D36] hover:text-[#c91126]"
+                        title={t('inventory.productList.actions.delete')}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
     </div>
