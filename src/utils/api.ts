@@ -129,4 +129,26 @@ export const inventoryApi = {
       };
     }
   }
+  ,
+
+  lookupBarcode: async (barcode: string): Promise<ApiResponse<Product | null>> => {
+    try {
+      const response = await fetch(`${API_URL}/lookup-barcode?barcode=${barcode}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to lookup barcode');
+      }
+
+      return {
+        success: true,
+        data: data as Product
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred'
+      };
+    }
+  }
 };
