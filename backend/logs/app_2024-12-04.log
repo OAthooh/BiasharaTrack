@@ -9,3 +9,6 @@ INFO: 2024/12/04 21:21:24 log.go:39: Successful login for user: ted@gmail.com
 INFO: 2024/12/04 21:38:41 log.go:39: Successful login for user: ted@gmail.com
 INFO: 2024/12/04 21:43:07 log.go:39: Successful login for user: ted@gmail.com
 INFO: 2024/12/04 22:04:05 log.go:39: Successful login for user: ted@gmail.com
+WARNING: 2024/12/04 22:40:25 log.go:44: Login attempt with non-existent email: kerry@gmail.com
+WARNING: 2024/12/04 22:40:46 log.go:44: Login attempt with non-existent email: kerry@gmail.com
+WARNING: 2024/12/04 22:49:05 log.go:44: Login attempt with non-existent email: kerry@gmail.com

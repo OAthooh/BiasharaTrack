@@ -1,0 +1,15 @@
+WARNING: 2024/12/05 10:43:36 log.go:44: Login attempt with non-existent email: kerry@gmail.com
+INFO: 2024/12/05 10:43:40 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:43:40 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:44:43 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:44:43 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:57:32 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:57:32 log.go:39: Successfully fetched all products
+WARNING: 2024/12/05 10:57:53 log.go:44: Login attempt with non-existent email: kerry@gmail.com
+INFO: 2024/12/05 10:58:03 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:58:03 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:58:13 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 10:58:13 log.go:39: Successfully fetched all products
+WARNING: 2024/12/05 15:51:10 log.go:44: Login attempt with non-existent email: kerry@gmail.com
+INFO: 2024/12/05 15:51:13 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 15:51:13 log.go:39: Successfully fetched all products
