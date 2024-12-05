@@ -29,6 +29,8 @@ export interface SaleFormData {
   paymentMethod: 'cash' | 'mpesa' | 'credit';
   customerName?: string;
   customerPhone?: string;
+  amount?: string;
+  referenceNumber?: string;
 }
 
 export interface SalesMetrics {
