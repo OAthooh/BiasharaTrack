@@ -1,4 +1,51 @@
 {
+  "creditPanel": {
+    "title": "Credit Management",
+    "outstanding": "Outstanding",
+    "paymentsdue": "{{count}} payments due today",
+    "button": "Manage Credits"
+  },
+  "financialPanel": {
+    "title": "Financial Overview",
+    "netProfit": "Net Profit",
+    "increase": "{{percentage}}% increase this month",
+    "button": "View Reports"
+  },
+  "inventoryPanel": {
+    "title": "Inventory Status",
+    "totalItems": "Total Items",
+    "lowStock": "{{count}} items low in stock",
+    "button": "Add New Item"
+  },
+  "salesPanel": {
+    "title": "Today's Sales",
+    "totalSales": "Total Sales",
+    "increase": "{{percentage}}% increase from yesterday",
+    "button": "New Sale"
+  },
+
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "inventory": "Inventory",
+      "sales": "Sales",
+      "analytics": "Analytics",
+      "credit": "Credit",
+      "reports": "Reports",
+      "tutorials": "Tutorials",
+      "settings": "Settings",
+      "signOut": "Sign out"
+    },
+    "search": {
+      "placeholder": "Search",
+      "label": "Search field",
+      "notifications": "View notifications"
+    },
+    "sidebar": {
+      "openSidebar": "Open sidebar"
+    }
+  },
+  
   "hero": {
     "title": "Empowering Kenya's Informal Traders with Smart Business Tools",
     "subtitle": "Transform your business with our all-in-one solution for inventory management, sales tracking, and financial insights.",

@@ -1,4 +1,50 @@
 {
+  "creditPanel": {
+    "title": "Usimamizi wa Mikopo",
+    "outstanding": "Deni",
+    "paymentsdue": "malipo {{ count }} yanayotakiwa leo",
+    "button": "Simamia Mikopo"
+  },
+  "financialPanel": {
+    "title": "Muhtasari wa Kifedha",
+    "netProfit": "Faida Halisi",
+    "increase": "ongezeko {{percentage}}% mwezi huu",
+    "button": "Tazama Ripoti"
+  },
+  "inventoryPanel": {
+    "title": "Hali ya Bidhaa",
+    "totalItems": "Jumla ya Bidhaa",
+    "lowStock": "malipo {{count}} yanayotakiwa leo",
+    "button": "Ongeza Bidhaa Mpya"
+  },
+  "salesPanel": {
+    "title": "Mauzo ya Leo",
+    "totalSales": "Jumla ya Mauzo",
+    "increase": "ongezeko {{percentage}}% kutoka jana",
+    "button": "Mauzo Mapya"
+  },
+
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Dashibodi",
+      "inventory": "Bidhaa",
+      "sales": "Mauzo",
+      "analytics": "Uchambuzi",
+      "credit": "Mikopo",
+      "reports": "Ripoti",
+      "tutorials": "Mafunzo",
+      "settings": "Mipangilio",
+      "signOut": "Toka"
+    },
+    "search": {
+      "placeholder": "Tafuta",
+      "label": "Sehemu ya kutafuta",
+      "notifications": "Tazama arifa"
+    },
+    "sidebar": {
+      "openSidebar": "Fungua upau wa kando"
+    }
+  },
   "hero": {
     "title": "Kuwezesha Wafanyabiashara wa Kenya na Zana Bora za Kibiashara",
     "subtitle": "Boresha biashara yako na suluhisho letu kamili la usimamizi wa bidhaa, ufuatiliaji wa mauzo, na ufahamu wa kifedha.",
