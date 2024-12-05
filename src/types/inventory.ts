@@ -1,15 +1,15 @@
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   description: string;
-  categoryId: string;
+  category: string;
   price: number;
   barcode: string;
-  imageUrl: string;
+  photo_path: string;
   quantity: number;
-  lowStockThreshold: number;
-  createdAt: Date;
-  updatedAt: Date;
+  low_stock_threshold: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ProductCategory {
@@ -18,22 +18,28 @@ export interface ProductCategory {
 }
 
 export interface StockAlert {
-  id: string;
-  productId: string;
-  productName: string;
-  message: string;
+  id: number;
+  product_id: number;
+  product_name: string;
+  alert_message: string;
   resolved: boolean;
-  createdAt: Date;
-  resolvedAt?: Date;
+  created_at: Date;
+  current_quantity: number;
+  stock_threshold: number;
 }
 
 export interface ProductFormData {
   name: string;
   description: string;
-  categoryId: string;
+  category: string;
   price: string;
   barcode: string;
   quantity: string;
-  lowStockThreshold: string;
-  image: File | null;
+  low_stock_threshold: string;
+  photo_path: File | null;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
 }

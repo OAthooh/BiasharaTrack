@@ -10,10 +10,13 @@ import (
 func InventoryManagementRoutes(router *gin.Engine, db *sql.DB) {
 	im := controllers.NewInventoryManagementHandler(db)
 
-	router.POST("/products", im.CreateProduct)
-	router.PUT("/products/:id", im.UpdateProduct)
-	router.DELETE("/products/:id", im.DeleteProduct)
-	router.GET("/products/:id", im.GetProduct)
-	router.GET("/products", im.GetAllProducts)
-	router.POST("/sell", im.SellProduct)
+	router.Static("/uploads", "./uploads")
+
+	router.POST("/create-product", im.CreateProduct)
+	router.PUT("/update-product/:id", im.UpdateProduct)
+	router.DELETE("/delete-product/:id", im.DeleteProduct)
+	router.GET("/get-product/:id", im.GetProduct)
+	router.GET("/get-all-products", im.GetAllProducts)
+	router.POST("/sell-product", im.SellProduct)
+	router.GET("/get-low-stock-alerts", im.GetLowStockAlerts)
 }

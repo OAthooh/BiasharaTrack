@@ -2,47 +2,83 @@ import React, { useState } from 'react';
 import { Upload, Plus, AlertCircle } from 'lucide-react';
 import { ProductFormData } from '../../types/inventory';
 import { categories } from '../../data/categories';
-import { validateProduct } from '../../utils/validation';
+import { inventoryApi } from '../../utils/api';
 
 export default function AddProduct() {
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
-    categoryId: '',
+    category: '',
     price: '',
     barcode: '',
     quantity: '',
-    lowStockThreshold: '',
-    image: null,
+    low_stock_threshold: '',
+    photo_path: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validationErrors = validateProduct(formData);
     
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+    // Sanitize numeric values
+    const price = parseFloat(formData.price.replace(/[^0-9.]/g, ''));
+    const quantity = parseInt(formData.quantity.replace(/[^0-9]/g, ''), 10);
+    
+    // Create FormData object
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('category', formData.category);
+    formDataToSend.append('price', price.toString());
+    formDataToSend.append('barcode', formData.barcode);
+    formDataToSend.append('quantity', quantity.toString());
+    formDataToSend.append('low_stock_threshold', formData.low_stock_threshold);
+    
+    if (formData.photo_path) {
+      formDataToSend.append('image', formData.photo_path);
     }
 
+    // Validate numbers
+    if (isNaN(price) || isNaN(quantity)) {
+        setErrors({
+            ...errors,
+            price: isNaN(price) ? 'Invalid price format' : '',
+            quantity: isNaN(quantity) ? 'Invalid quantity format' : ''
+        });
+        return;
+    }
+    console.log(formData);
     try {
-      // Add API call here
-      setSuccess('Product added successfully!');
-      setFormData({
-        name: '',
-        description: '',
-        categoryId: '',
-        price: '',
-        barcode: '',
-        quantity: '',
-        lowStockThreshold: '',
-        image: null,
-      });
-      setErrors({});
+        const response = await inventoryApi.createProduct({
+            name: formData.name,
+            description: formData.description,
+            category: formData.category,
+            price: price,
+            barcode: formData.barcode,
+            quantity: quantity,
+            image: formData.photo_path,
+            low_stock_threshold: formData.low_stock_threshold
+        });
+        
+        if (!response.success) {
+            throw new Error(response.error);
+        }
+
+        setSuccess('Product added successfully!');
+        setFormData({
+            name: '',
+            description: '',
+            category: '',
+            price: '',
+            barcode: '',
+            quantity: '',
+            low_stock_threshold: '',
+            photo_path: null,
+        });
+        setErrors({});
     } catch (error) {
-      setErrors({ submit: 'Failed to add product. Please try again.' });
+        setErrors({ submit: error instanceof Error ? error.message : 'Failed to add product. Please try again.' });
     }
   };
 
@@ -50,7 +86,7 @@ export default function AddProduct() {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-      setFormData({ ...formData, image: file });
+      setFormData({ ...formData, photo_path: file });
     }
   };
 
@@ -108,12 +144,12 @@ export default function AddProduct() {
           <select
             required
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-            value={formData.categoryId}
-            onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
           >
             <option value="">Select a category</option>
             {categories.map((category) => (
-              <option key={category.id} value={category.id}>
+              <option key={category.id} value={category.name}>
                 {category.name}
               </option>
             ))}
@@ -181,13 +217,13 @@ export default function AddProduct() {
               required
               min="0"
               className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent ${
-                errors.lowStockThreshold ? 'border-red-500' : 'border-gray-300'
+                errors.low_stock_threshold ? 'border-red-500' : 'border-gray-300'
               }`}
-              value={formData.lowStockThreshold}
-              onChange={(e) => setFormData({ ...formData, lowStockThreshold: e.target.value })}
+              value={formData.low_stock_threshold}
+              onChange={(e) => setFormData({ ...formData, low_stock_threshold: e.target.value })}
             />
-            {errors.lowStockThreshold && (
-              <p className="mt-1 text-sm text-red-500">{errors.lowStockThreshold}</p>
+            {errors.low_stock_threshold && (
+              <p className="mt-1 text-sm text-red-500">{errors.low_stock_threshold}</p>
             )}
           </div>
         </div>
@@ -207,13 +243,13 @@ export default function AddProduct() {
                 className="hidden"
                 accept="image/*"
                 onChange={(e) =>
-                  setFormData({ ...formData, image: e.target.files?.[0] || null })
+                  setFormData({ ...formData, photo_path: e.target.files?.[0] || null })
                 }
               />
             </label>
           </p>
-          {formData.image && (
-            <p className="text-sm text-gray-500 mt-2">{formData.image.name}</p>
+          {formData.photo_path && (
+            <p className="text-sm text-gray-500 mt-2">{formData.photo_path.name}</p>
           )}
         </div>
 

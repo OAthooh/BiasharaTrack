@@ -3,6 +3,11 @@ package controllers
 import (
 	"database/sql"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -20,74 +25,182 @@ func NewInventoryManagementHandler(db *sql.DB) *InventoryManagementHandler {
 }
 
 func (im *InventoryManagementHandler) CreateProduct(c *gin.Context) {
-	var request struct {
-		models.Product
-		Quantity int    `json:"quantity"`
-		Image    string `json:"image"`
-	}
-	if err := c.ShouldBindJSON(&request); err != nil {
-		utils.ErrorLogger("Failed to parse create product request: %v", err)
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+	// Set a reasonable max size for the entire form (including file)
+	if err := c.Request.ParseMultipartForm(10 << 20); err != nil { // 10 MB max
+		utils.ErrorLogger("Failed to parse multipart form: %v", err)
+		c.JSON(400, gin.H{"error": "Invalid form data"})
 		return
 	}
 
-	// Set timestamps
-	now := time.Now()
-	request.Product.CreatedAt = now
-	request.Product.UpdatedAt = now
+	// Get the file from form
+	file, header, err := c.Request.FormFile("image")
+	if !isAllowedImageType(file) {
+		utils.ErrorLogger("Invalid file type uploaded")
+		c.JSON(400, gin.H{"error": "Invalid file type. Only JPEG, PNG and GIF are allowed"})
+		return
+	}
+	var imagePath string
+	if err == nil {
+		defer file.Close()
 
-	// Set photo path based on image name
-	if request.Image != "" {
-		request.Product.PhotoPath = fmt.Sprintf("/images/products/%s", request.Image)
+		// Create the uploads directory if it doesn't exist
+		uploadsDir := "uploads/products"
+		if err := os.MkdirAll(uploadsDir, 0o755); err != nil {
+			utils.ErrorLogger("Failed to create uploads directory: %v", err)
+			c.JSON(500, gin.H{"error": "Failed to process image"})
+			return
+		}
+
+		// Generate a unique filename
+		filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), header.Filename)
+		imagePath = filepath.Join(uploadsDir, filename)
+
+		// Create the file
+		dst, err := os.Create(imagePath)
+		if err != nil {
+			utils.ErrorLogger("Failed to create file: %v", err)
+			c.JSON(500, gin.H{"error": "Failed to save image"})
+			return
+		}
+		defer dst.Close()
+
+		// Copy the uploaded file to the destination file
+		if _, err := io.Copy(dst, file); err != nil {
+			utils.ErrorLogger("Failed to copy file: %v", err)
+			c.JSON(500, gin.H{"error": "Failed to save image"})
+			return
+		}
+
+		// Convert filepath to URL path
+		imagePath = "/uploads/products/" + filename
+	}
+
+	// Parse other form fields
+	product := models.Product{
+		Name:        c.Request.FormValue("name"),
+		Description: c.Request.FormValue("description"),
+		Category:    c.Request.FormValue("category"),
+		Barcode:     c.Request.FormValue("barcode"),
+		PhotoPath:   imagePath,
+	}
+
+	// Parse price
+	if price, err := strconv.ParseFloat(c.Request.FormValue("price"), 64); err == nil {
+		product.Price = price
+	} else {
+		utils.ErrorLogger("Invalid price format: %v", err)
+		c.JSON(400, gin.H{"error": "Invalid price format"})
+		return
+	}
+
+	// Parse quantity
+	var quantity int
+	if q, err := strconv.Atoi(c.Request.FormValue("quantity")); err == nil {
+		if q < 0 {
+			c.JSON(400, gin.H{"error": "Quantity must be non-negative"})
+			return
+		}
+		quantity = q
+	} else {
+		utils.ErrorLogger("Invalid quantity format: %v", err)
+		c.JSON(400, gin.H{"error": "Invalid quantity format"})
+		return
+	}
+
+	// Parse threshold
+	var threshold int
+	if t, err := strconv.Atoi(c.Request.FormValue("low_stock_threshold")); err == nil {
+		if t < 0 {
+			c.JSON(400, gin.H{"error": "Threshold must be non-negative"})
+			return
+		}
+		threshold = t
+	} else {
+		utils.ErrorLogger("Invalid threshold format: %v", err)
+		c.JSON(400, gin.H{"error": "Invalid threshold format"})
+		return
 	}
 
 	// Start transaction
 	tx, err := im.db.Begin()
 	if err != nil {
-		utils.ErrorLogger("Failed to start transaction for product creation: %v", err)
-		c.JSON(500, gin.H{"error": "Failed to start transaction"})
+		utils.ErrorLogger("Failed to start transaction: %v", err)
+		c.JSON(500, gin.H{"error": "Internal server error"})
 		return
 	}
 	defer tx.Rollback()
 
+	// Set timestamps
+	now := time.Now()
+	product.CreatedAt = now
+	product.UpdatedAt = now
+
 	// Insert product
 	result, err := tx.Exec(`
-		INSERT INTO Products (name, description, category, price, barcode, photo_path, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		request.Product.Name, request.Product.Description, request.Product.Category, request.Product.Price,
-		request.Product.Barcode, request.Product.PhotoPath, request.Product.CreatedAt, request.Product.UpdatedAt)
+		INSERT INTO Products (
+			name, description, category, price, barcode, 
+			photo_path, created_at, updated_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		product.Name, product.Description, product.Category,
+		product.Price, product.Barcode, product.PhotoPath,
+		product.CreatedAt, product.UpdatedAt,
+	)
 	if err != nil {
-		utils.ErrorLogger("Failed to insert new product: %v", err)
+		utils.ErrorLogger("Failed to insert product: %v", err)
 		c.JSON(500, gin.H{"error": "Failed to create product"})
 		return
 	}
 
-	id, _ := result.LastInsertId()
-	request.Product.ID = int(id)
+	// Get the ID of the newly created product
+	productID, err := result.LastInsertId()
+	if err != nil {
+		utils.ErrorLogger("Failed to get last insert ID: %v", err)
+		c.JSON(500, gin.H{"error": "Failed to create product"})
+		return
+	}
 
-	// Insert initial inventory if quantity provided
-	if request.Quantity > 0 {
-		_, err = tx.Exec(`
-			INSERT INTO Inventory (product_id, quantity, last_updated)
-			VALUES (?, ?, ?)`,
-			id, request.Quantity, now)
+	// Insert initial inventory record with threshold
+	_, err = tx.Exec(`
+		INSERT INTO Inventory (
+			product_id, quantity, low_stock_threshold, last_updated
+		) VALUES (?, ?, ?, ?)`,
+		productID, quantity, threshold, now,
+	)
+	if err != nil {
+		utils.ErrorLogger("Failed to insert inventory record: %v", err)
+		c.JSON(500, gin.H{"error": "Failed to create inventory record"})
+		return
+	}
+
+	if err := tx.Commit(); err != nil {
+		utils.ErrorLogger("Failed to commit transaction: %v", err)
+		c.JSON(500, gin.H{"error": "Failed to create product"})
+		return
+	}
+
+	product.ID = int(productID)
+	// Check if initial quantity is below threshold and create alert if needed
+	if quantity <= threshold {
+		_, err = im.db.Exec(`
+			INSERT INTO LowStockAlerts (
+				product_id, alert_message, resolved, created_at
+			) VALUES (?, ?, ?, ?)`,
+			productID,
+			fmt.Sprintf("Low stock alert for %s: %d units remaining (threshold: %d)",
+				product.Name, quantity, threshold),
+			false,
+			now,
+		)
 		if err != nil {
-			utils.ErrorLogger("Failed to set initial inventory for product %d: %v", id, err)
-			c.JSON(500, gin.H{"error": "Failed to set initial inventory"})
+			utils.ErrorLogger("Failed to create low stock alert: %v", err)
+			c.JSON(500, gin.H{"error": "Failed to create low stock alert"})
 			return
 		}
 	}
 
-	if err = tx.Commit(); err != nil {
-		utils.ErrorLogger("Failed to commit transaction for product creation: %v", err)
-		c.JSON(500, gin.H{"error": "Failed to commit transaction"})
-		return
-	}
-
-	utils.InfoLogger("Successfully created new product with ID %d", id)
-	c.JSON(201, gin.H{
-		"product":  request.Product,
-		"quantity": request.Quantity,
+	c.JSON(200, gin.H{
+		"success": true,
+		"data":    product,
 	})
 }
 
@@ -216,6 +329,31 @@ func (im *InventoryManagementHandler) UpdateProduct(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Failed to commit transaction"})
 		return
 	}
+	// Check if quantity is below threshold and create alert if needed
+	var currentQuantity, threshold int
+	err = im.db.QueryRow(`
+		SELECT quantity, low_stock_threshold 
+		FROM Inventory 
+		WHERE product_id = ?`, productID).Scan(&currentQuantity, &threshold)
+	if err != nil && err != sql.ErrNoRows {
+		utils.ErrorLogger("Failed to check inventory levels for product %d: %v", productID, err)
+	} else if err == nil && currentQuantity <= threshold {
+		// Get product name for alert message
+		var productName string
+		err = im.db.QueryRow("SELECT name FROM Products WHERE id = ?", productID).Scan(&productName)
+		if err == nil {
+			alertMsg := fmt.Sprintf("Low stock alert for %s: Current quantity (%d) is at or below threshold (%d)",
+				productName, currentQuantity, threshold)
+
+			_, err = im.db.Exec(`
+				INSERT INTO LowStockAlerts (product_id, alert_message, resolved, created_at)
+				VALUES (?, ?, false, CURRENT_TIMESTAMP)`,
+				productID, alertMsg)
+			if err != nil {
+				utils.ErrorLogger("Failed to create low stock alert for product %d: %v", productID, err)
+			}
+		}
+	}
 
 	utils.InfoLogger("Successfully updated product %d", productID)
 	c.JSON(200, gin.H{"message": "Product updated successfully"})
@@ -327,9 +465,9 @@ func (im *InventoryManagementHandler) SellProduct(c *gin.Context) {
 		Quantity  int     `json:"quantity" binding:"required"`
 		Note      string  `json:"note"`
 		SaleType  string  `json:"sale_type"` // "CASH" or "CREDIT"
-		Name      string  `json:"name"`       // Required for credit sales
-		Phone     string  `json:"phone"`      // Optional for credit sales
-		Amount    float64 `json:"amount"`     // Required for credit sales
+		Name      string  `json:"name"`      // Required for credit sales
+		Phone     string  `json:"phone"`     // Optional for credit sales
+		Amount    float64 `json:"amount"`    // Required for credit sales
 	}
 
 	if err := c.ShouldBindJSON(&sellRequest); err != nil {
@@ -370,7 +508,7 @@ func (im *InventoryManagementHandler) SellProduct(c *gin.Context) {
 
 	// Check if we have enough stock
 	if currentQuantity < sellRequest.Quantity {
-		utils.WarningLogger("Insufficient stock for product %d. Requested: %d, Available: %d", 
+		utils.WarningLogger("Insufficient stock for product %d. Requested: %d, Available: %d",
 			sellRequest.ProductID, sellRequest.Quantity, currentQuantity)
 		c.JSON(400, gin.H{"error": "Insufficient stock"})
 		return
@@ -403,7 +541,7 @@ func (im *InventoryManagementHandler) SellProduct(c *gin.Context) {
 	_, err = tx.Exec(`
 		INSERT INTO StockMovements (product_id, change_type, quantity_change, note)
 		VALUES (?, ?, ?, ?)`,
-		sellRequest.ProductID, sellRequest.SaleType, -sellRequest.Quantity, 
+		sellRequest.ProductID, sellRequest.SaleType, -sellRequest.Quantity,
 		fmt.Sprintf("%s sale of %d units", sellRequest.SaleType, sellRequest.Quantity))
 	if err != nil {
 		utils.ErrorLogger("Failed to record sale type stock movement for product %d: %v", sellRequest.ProductID, err)
@@ -450,4 +588,93 @@ func (im *InventoryManagementHandler) SellProduct(c *gin.Context) {
 		"message":      "Sale recorded successfully",
 		"new_quantity": newQuantity,
 	})
+}
+
+// Add this function to your controller
+func isAllowedImageType(file multipart.File) bool {
+	// Read the first 512 bytes to detect content type
+	buffer := make([]byte, 512)
+	_, err := file.Read(buffer)
+	if err != nil {
+		return false
+	}
+
+	// Seek back to start of file
+	file.Seek(0, 0)
+
+	// Check content type
+	contentType := http.DetectContentType(buffer)
+
+	allowedTypes := map[string]bool{
+		"image/jpeg": true,
+		"image/png":  true,
+		"image/gif":  true,
+	}
+
+	return allowedTypes[contentType]
+}
+
+func (im *InventoryManagementHandler) GetLowStockAlerts(c *gin.Context) {
+	
+	// Query to get low stock alerts with product details
+	rows, err := im.db.Query(`
+		SELECT 
+			a.id,
+			a.product_id,
+			a.alert_message,
+			a.resolved,
+			a.created_at,
+			p.name as product_name,
+			i.quantity as current_quantity,
+			i.low_stock_threshold
+		FROM LowStockAlerts a
+		JOIN Products p ON a.product_id = p.id 
+		JOIN Inventory i ON p.id = i.product_id
+		ORDER BY a.created_at DESC`)
+	if err != nil {
+		utils.ErrorLogger("Failed to fetch low stock alerts: %v", err)
+		c.JSON(500, gin.H{"error": "Failed to fetch alerts"})
+		return
+	}
+	defer rows.Close()
+
+	var alerts []gin.H
+	for rows.Next() {
+		var (
+			id             int
+			productID      int
+			alertMessage   string
+			resolved       bool
+			createdAt      time.Time
+			productName    string
+			quantity       int
+			stockThreshold int
+		)
+
+		err := rows.Scan(&id, &productID, &alertMessage, &resolved, &createdAt,
+			&productName, &quantity, &stockThreshold)
+		if err != nil {
+			utils.ErrorLogger("Error scanning alert row: %v", err)
+			continue
+		}
+
+		alerts = append(alerts, gin.H{
+			"id":               id,
+			"product_id":       productID,
+			"product_name":     productName,
+			"alert_message":    alertMessage,
+			"resolved":         resolved,
+			"created_at":       createdAt,
+			"current_quantity": quantity,
+			"stock_threshold":  stockThreshold,
+		})
+	}
+
+	if err = rows.Err(); err != nil {
+		utils.ErrorLogger("Error iterating alert rows: %v", err)
+		c.JSON(500, gin.H{"error": "Error processing alerts"})
+		return
+	}
+
+	c.JSON(200, alerts)
 }

@@ -2,7 +2,7 @@ export function validateProduct(formData: {
   name: string;
   price: string;
   quantity: string;
-  lowStockThreshold: string;
+  low_stock_threshold: string;
 }) {
   const errors: Record<string, string> = {};
 
@@ -20,9 +20,9 @@ export function validateProduct(formData: {
     errors.quantity = 'Quantity must be a positive number';
   }
 
-  const threshold = parseInt(formData.lowStockThreshold);
+  const threshold = parseInt(formData.low_stock_threshold);
   if (isNaN(threshold) || threshold < 0) {
-    errors.lowStockThreshold = 'Threshold must be a positive number';
+    errors.low_stock_threshold = 'Threshold must be a positive number';
   }
 
   return errors;
