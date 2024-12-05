@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"database/sql"
+	"errors"
 	"net/http"
 	"time"
 
@@ -10,13 +10,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type AuthHandler struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewAuthHandler(db *sql.DB) *AuthHandler {
+func NewAuthHandler(db *gorm.DB) *AuthHandler {
 	return &AuthHandler{db: db}
 }
 
@@ -40,18 +41,15 @@ func (auth *AuthHandler) Login(c *gin.Context) {
 
 	// Get user from database
 	var user models.User
-	err := auth.db.QueryRow(
-		"SELECT id, full_name, email, password FROM auth WHERE email = ?",
-		loginRequest.Email,
-	).Scan(&user.ID, &user.FullName, &user.Email, &user.Password)
-	if err != nil {
-		if err == sql.ErrNoRows {
+	result := auth.db.Where("email = ?", loginRequest.Email).First(&user)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
 			utils.WarningLogger("Login attempt with non-existent email: %s", loginRequest.Email)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
 
-		utils.ErrorLogger("Database error during login: %v", err)
+		utils.ErrorLogger("Database error during login: %v", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 		return
 	}
@@ -71,7 +69,7 @@ func (auth *AuthHandler) Login(c *gin.Context) {
 		"exp":       time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
 	})
 
-	tokenString, err := token.SignedString([]byte("f50559429275498b09d13392269fc0fd02a2f548d8470c3765a8895212080636")) //To Do Later Replace with secure secret key
+	tokenString, err := token.SignedString([]byte("f50559429275498b09d13392269fc0fd02a2f548d8470c3765a8895212080636")) // To Do Later Replace with secure secret key
 	if err != nil {
 		utils.ErrorLogger("Error generating token: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
@@ -109,16 +107,15 @@ func (auth *AuthHandler) Register(c *gin.Context) {
 	}
 
 	// Check if email already exists
-	var exists bool
-	err := auth.db.QueryRow("SELECT EXISTS(SELECT 1 FROM auth WHERE email = ?)", registerRequest.Email).Scan(&exists)
-	if err != nil {
-		utils.ErrorLogger("Database error checking email existence: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-		return
-	}
-	if exists {
+	var existingUser models.User
+	result := auth.db.Where("email = ?", registerRequest.Email).First(&existingUser)
+	if result.Error == nil {
 		utils.WarningLogger("Registration attempt with existing email: %s", registerRequest.Email)
 		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
+		return
+	} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		utils.ErrorLogger("Database error checking email existence: %v", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 		return
 	}
 
@@ -130,44 +127,43 @@ func (auth *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Insert new user
-	result, err := auth.db.Exec("INSERT INTO auth (full_name, email, password) VALUES (?, ?, ?)",
-		registerRequest.FullName,
-		registerRequest.Email,
-		hashedPassword,
-	)
-	if err != nil {
-		utils.ErrorLogger("Error creating new user: %v", err)
+	// Create new user
+	newUser := models.User{
+		FullName: registerRequest.FullName,
+		Email:    registerRequest.Email,
+		Password: string(hashedPassword),
+	}
+
+	result = auth.db.Create(&newUser)
+	if result.Error != nil {
+		utils.ErrorLogger("Error creating new user: %v", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating user"})
 		return
 	}
 
-	// Get the ID of the newly created user
-	userID, _ := result.LastInsertId()
-
 	// Generate JWT token for the new user
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":   userID,
-		"email":     registerRequest.Email,
-		"full_name": registerRequest.FullName,
+		"user_id":   newUser.ID,
+		"email":     newUser.Email,
+		"full_name": newUser.FullName,
 		"exp":       time.Now().Add(time.Hour * 24).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte("your-secret-key")) //To Do Later Replace with secure secret key
+	tokenString, err := token.SignedString([]byte("your-secret-key")) // To Do Later Replace with secure secret key
 	if err != nil {
 		utils.ErrorLogger("Error generating token for new user: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
 		return
 	}
 
-	utils.InfoLogger("Successfully registered new user: %s", registerRequest.Email)
+	utils.InfoLogger("Successfully registered new user: %s", newUser.Email)
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
 		"token":   tokenString,
 		"user": gin.H{
-			"id":        userID,
-			"full_name": registerRequest.FullName,
-			"email":     registerRequest.Email,
+			"id":        newUser.ID,
+			"full_name": newUser.FullName,
+			"email":     newUser.Email,
 		},
 	})
 }

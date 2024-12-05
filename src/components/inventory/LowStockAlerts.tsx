@@ -45,7 +45,7 @@ export default function LowStockAlerts() {
   const filteredAlerts = Array.isArray(alerts) ? alerts.filter((alert) => {
     const matchesSearch = alert.product_name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || 
-      (statusFilter === 'resolved' ? alert.resolved : !alert.resolved);
+      (statusFilter === 'resolved' ? alert.resolved === true : alert.resolved === false);
     return matchesSearch && matchesStatus;
   }) : [];
 
@@ -161,7 +161,7 @@ export default function LowStockAlerts() {
                       className="text-sm text-[#2EC4B6] hover:text-[#28b0a3] whitespace-nowrap"
                       onClick={() => handleResolve(alert.id)}
                     >
-                      {t('inventory.lowStockAlerts.resolve')}
+                      Resolve
                     </button>
                   )}
                 </div>

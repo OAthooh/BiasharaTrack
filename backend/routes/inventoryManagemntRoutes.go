@@ -1,13 +1,12 @@
 package routes
 
 import (
-	"database/sql"
-
 	"github.com/OAthooh/BiasharaTrack.git/controllers"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func InventoryManagementRoutes(router *gin.Engine, db *sql.DB) {
+func InventoryManagementRoutes(router *gin.Engine, db *gorm.DB) {
 	im := controllers.NewInventoryManagementHandler(db)
 
 	router.Static("/uploads", "./uploads")
