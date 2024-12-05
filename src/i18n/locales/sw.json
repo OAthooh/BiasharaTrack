@@ -1,4 +1,62 @@
 {
+  "inventory": {
+    "addProduct": {
+      "title": "Ongeza Bidhaa Mpya",
+      "productName": "Jina la Bidhaa",
+      "description": "Maelezo",
+      "category": "Kategoria",
+      "selectCategory": "Chagua kategoria",
+      "price": "Bei (KSH)",
+      "quantity": "Kiasi",
+      "barcode": "Msimbo wa Pau",
+      "lowStockThreshold": "Kiwango cha Chini cha Hifadhi",
+      "uploadImage": "Buruta na uache picha ya bidhaa yako hapa, au",
+      "browse": "tafuta",
+      "addButton": "Ongeza Bidhaa",
+      "success": "Bidhaa imeongezwa kwa mafanikio!",
+      "error": "Imeshindwa kuongeza bidhaa. Tafadhali jaribu tena."
+    },
+    "lowStockAlerts": {
+      "title": "Arifa za Bidhaa Zinazokaribia Kuisha",
+      "export": "Hamisha",
+      "searchPlaceholder": "Tafuta arifa...",
+      "status": {
+        "all": "Hali Zote",
+        "resolved": "Zilizoshughulikiwa",
+        "unresolved": "Hazijashughulikiwa"
+      },
+      "quantity": "Kiasi",
+      "threshold": "Kiwango",
+      "created": "Imetengenezwa",
+      "resolveButton": "Shughulikia"
+    },
+    "productList": {
+      "title": "Orodha ya Bidhaa",
+      "searchPlaceholder": "Tafuta bidhaa...",
+      "allCategories": "Kategoria Zote",
+      "stockFilter": {
+        "all": "Hifadhi Zote",
+        "low": "Hifadhi Ndogo",
+        "out": "Zimekwisha",
+        "in": "Zinapatikana"
+      },
+      "tableHeaders": {
+        "product": "Bidhaa",
+        "category": "Kategoria",
+        "quantity": "Kiasi",
+        "price": "Bei",
+        "lastUpdated": "Mara ya Mwisho Kusasishwa",
+        "actions": "Vitendo"
+      },
+      "minimum": "Chini",
+      "actions": {
+        "view": "Tazama",
+        "edit": "Hariri",
+        "delete": "Futa"
+      }
+    }
+  },
+  
   "creditPanel": {
     "title": "Usimamizi wa Mikopo",
     "outstanding": "Deni",
