@@ -10,6 +10,8 @@ export default function SalesEntry() {
     paymentMethod: 'cash',
     customerName: '',
     customerPhone: '',
+    amount: '',
+    referenceNumber: '',
   });
   const [selectedProduct, setSelectedProduct] = useState<string>('');
   const [quantity, setQuantity] = useState<string>('1');
@@ -55,6 +57,8 @@ export default function SalesEntry() {
         paymentMethod: 'cash',
         customerName: '',
         customerPhone: '',
+        amount: '',
+        referenceNumber: '',
       });
     } catch (error) {
       setError('Failed to record sale. Please try again.');
@@ -201,6 +205,31 @@ export default function SalesEntry() {
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
               value={formData.customerPhone}
               onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-[#011627] mb-1">
+              Amount (Kshs)
+            </label>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+              value={formData.amount}
+              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#011627] mb-1">
+              Reference Number 
+            </label>
+            <input
+              type="tel"
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+              value={formData.referenceNumber}
+              onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
             />
           </div>
         </div>
