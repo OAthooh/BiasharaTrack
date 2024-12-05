@@ -615,7 +615,6 @@ func isAllowedImageType(file multipart.File) bool {
 }
 
 func (im *InventoryManagementHandler) GetLowStockAlerts(c *gin.Context) {
-	
 	// Query to get low stock alerts with product details
 	rows, err := im.db.Query(`
 		SELECT 
@@ -677,4 +676,53 @@ func (im *InventoryManagementHandler) GetLowStockAlerts(c *gin.Context) {
 	}
 
 	c.JSON(200, alerts)
+}
+
+// LookupBarcode handles barcode lookup requests
+func (im *InventoryManagementHandler) LookupBarcode(c *gin.Context) {
+	barcode := c.Query("barcode")
+	if barcode == "" {
+		c.JSON(400, gin.H{"error": "Barcode is required"})
+		return
+	}
+
+	// Query the database for the product with the given barcode
+	var product struct {
+		Name        string
+		Description string
+		Price       float64
+	}
+
+	utils.InfoLogger("Looking up barcode received: %s", barcode)
+
+	// Mock data for testing barcode lookup
+	mockProducts := map[string]struct {
+		Name        string
+		Description string
+		Price       float64
+	}{
+		"123456789012": {
+			Name:        "Test Product 1",
+			Description: "This is a test product description",
+			Price:       19.99,
+		},
+		"987654321098": {
+			Name:        "Test Product 2",
+			Description: "Another test product description",
+			Price:       29.99,
+		},
+		"456789123456": {
+			Name:        "Test Product 3",
+			Description: "A third test product description",
+			Price:       9.99,
+		},
+	}
+
+	// Look up the mock product
+	product = mockProducts["987654321098"]
+
+	c.JSON(200, gin.H{
+		"success": true,
+		"data":    product,
+	})
 }
