@@ -13,3 +13,7 @@ INFO: 2024/12/05 10:58:13 log.go:39: Successfully fetched all products
 WARNING: 2024/12/05 15:51:10 log.go:44: Login attempt with non-existent email: kerry@gmail.com
 INFO: 2024/12/05 15:51:13 log.go:39: Successfully fetched all products
 INFO: 2024/12/05 15:51:13 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 15:58:37 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 15:58:37 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 16:24:55 log.go:39: Successfully fetched all products
+INFO: 2024/12/05 16:24:55 log.go:39: Successfully fetched all products
