@@ -5,12 +5,14 @@ import { formatDate } from '../../utils/formatters';
 import { inventoryApi } from '../../utils/api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 
 export default function LowStockAlerts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'resolved' | 'unresolved'>('all');
   const [alerts, setAlerts] = useState<StockAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -88,13 +90,13 @@ export default function LowStockAlerts() {
         transition-all duration-300 ease-in-out
       `}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-          <h2 className="text-xl font-semibold text-[#011627]">Low Stock Alerts</h2>
+          <h2 className="text-xl font-semibold text-[#011627]">{t('inventory.lowStockAlerts.title')}</h2>
           <button
             onClick={handleExport}
             className="flex items-center text-[#2EC4B6] hover:text-[#28b0a3]"
           >
             <Download className="w-5 h-5 mr-2" />
-            Export
+            {t('inventory.lowStockAlerts.export')}
           </button>
         </div>
 
@@ -103,7 +105,7 @@ export default function LowStockAlerts() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search alerts..."
+              placeholder={t('inventory.lowStockAlerts.searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -114,9 +116,9 @@ export default function LowStockAlerts() {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as 'all' | 'resolved' | 'unresolved')}
           >
-            <option value="all">All Status</option>
-            <option value="resolved">Resolved</option>
-            <option value="unresolved">Unresolved</option>
+            <option value="all">{t('inventory.lowStockAlerts.status.all')}</option>
+            <option value="resolved">{t('inventory.lowStockAlerts.status.resolved')}</option>
+            <option value="unresolved">{t('inventory.lowStockAlerts.status.unresolved')}</option>
           </select>
         </div>
 
@@ -147,10 +149,10 @@ export default function LowStockAlerts() {
                         {alert.product_name}
                       </h3>
                       <p className="text-sm text-gray-500">
-                        Quantity: {alert.current_quantity} / Threshold: {alert.stock_threshold}
+                      {t('inventory.lowStockAlerts.quantity')}: {alert.current_quantity} / {t('inventory.lowStockAlerts.threshold')}: {alert.stock_threshold}
                       </p>
                       <p className="text-xs text-gray-400 mt-1">
-                        Created: {formatDate(alert.created_at)}
+                      {t('inventory.lowStockAlerts.created')}: {formatDate(alert.created_at)}
                       </p>
                     </div>
                   </div>
@@ -159,7 +161,7 @@ export default function LowStockAlerts() {
                       className="text-sm text-[#2EC4B6] hover:text-[#28b0a3] whitespace-nowrap"
                       onClick={() => handleResolve(alert.id)}
                     >
-                      Resolve
+                      {t('inventory.lowStockAlerts.resolve')}
                     </button>
                   )}
                 </div>
