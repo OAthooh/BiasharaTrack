@@ -12,6 +12,17 @@ import {
   LogOut
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import UserProfile from './UserProfile';
+import { User } from '../../types/user';
+
+// Placeholder user data - replace with actual user data from authentication
+const currentUser: User = {
+  id: '1',
+  name: 'Sarah Mwangi',
+  email: 'sarah@biasharatrack.com',
+  role: 'owner',
+  businessName: 'Mwangi General Store',
+};
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -42,6 +53,9 @@ export default function Sidebar() {
       <div className="flex flex-col flex-grow bg-[#011627] overflow-y-auto">
         <div className="flex items-center h-16 flex-shrink-0 px-4">
           <h1 className="text-2xl font-bold text-[#FDFFFC]">BiasharaTrack</h1>
+        </div>
+        <div className="px-3 mb-6">
+          <UserProfile user={currentUser} />
         </div>
         <nav className="mt-5 flex-1 flex flex-col divide-y divide-[#FDFFFC]/10">
           <div className="px-2 space-y-1">
