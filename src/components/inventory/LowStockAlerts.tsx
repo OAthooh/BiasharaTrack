@@ -90,7 +90,7 @@ export default function LowStockAlerts() {
         transition-all duration-300 ease-in-out
       `}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-          <h2 className="text-xl font-semibold text-[#011627]">Low Stock Alerts</h2>
+          <h2 className="text-xl font-semibold text-[#011627]">{t('inventory.lowStockAlerts.title')}</h2>
           <button
             onClick={handleExport}
             className="flex items-center text-[#2EC4B6] hover:text-[#28b0a3]"
