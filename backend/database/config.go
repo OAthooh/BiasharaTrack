@@ -1,58 +1,66 @@
 package database
 
 import (
-	"database/sql"
-	"fmt"
-	"os"
-	"path/filepath"
-	"time"
-
 	_ "github.com/mattn/go-sqlite3"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"github.com/joho/godotenv"
+	"os"
 )
 
 type DB struct {
-	DB *sql.DB
+	DB *gorm.DB
 }
 
 func Connect() (*DB, error) {
-	// Ensure the directory exists
-	dbPath := "./database/storage/"
-	if err := os.MkdirAll(dbPath, os.ModePerm); err != nil {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
 		return nil, err
 	}
 
-	// Open the database with WAL journal mode and timeouts
-	db, err := sql.Open("sqlite3", filepath.Join(dbPath, "database.db")+"?_journal=WAL&_timeout=5000&_busy_timeout=5000")
+	// Retrieve environment variables
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	endpoint := os.Getenv("DB_ENDPOINT")
+	dbName := os.Getenv("DB_NAME")
+	port := os.Getenv("DB_PORT")
+
+	// Construct the connection string (DSN)
+	dsn := user + ":" + password + "@tcp(" + endpoint + ":" + port + ")/" + dbName + "?charset=utf8mb4&parseTime=True&loc=Local"
+
+	// Open connection to AWS RDS MySQL instance
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	// Test the connection
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	// Test ping
+	err = sqlDB.Ping()
 	if err != nil {
 		return nil, err
 	}
 
 	// Set connection pool settings
-	db.SetMaxOpenConns(1) // Limit to one connection to prevent locks
-	db.SetMaxIdleConns(1)
-	db.SetConnMaxLifetime(time.Hour)
-
-	// Execute PRAGMA statements for better concurrency
-	pragmas := []string{
-		"PRAGMA journal_mode=WAL",   // Write-Ahead Logging
-		"PRAGMA busy_timeout=5000",  // Wait up to 5s when database is locked
-		"PRAGMA synchronous=NORMAL", // Faster than FULL, still safe
-	}
-
-	for _, pragma := range pragmas {
-		_, err := db.Exec(pragma)
-		if err != nil {
-			db.Close() // Clean up before returning error
-			return nil, fmt.Errorf("failed to set pragma %s: %v", pragma, err)
-		}
-	}
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
 
 	return &DB{DB: db}, nil
 }
 
 func (d *DB) Close() error {
 	if d.DB != nil {
-		return d.DB.Close()
+		sqlDB, err := d.DB.DB()
+		if err != nil {
+			return err
+		}
+		return sqlDB.Close()
 	}
 	return nil
 }
