@@ -19,4 +19,5 @@ func InventoryManagementRoutes(router *gin.Engine, db *sql.DB) {
 	router.GET("/get-all-products", im.GetAllProducts)
 	router.POST("/sell-product", im.SellProduct)
 	router.GET("/get-low-stock-alerts", im.GetLowStockAlerts)
+	router.GET("/lookup-barcode/", im.LookupBarcode)
 }
