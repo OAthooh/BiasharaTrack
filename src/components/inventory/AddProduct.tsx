@@ -4,8 +4,10 @@ import { ProductFormData } from '../../types/inventory';
 import { categories } from '../../data/categories';
 import { inventoryApi } from '../../utils/api';
 import { BarcodeScanner } from './BarCodeScanning';
+import { useTranslation } from 'react-i18next';
 
 export default function AddProduct() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
@@ -67,7 +69,7 @@ export default function AddProduct() {
             throw new Error(response.error);
         }
 
-        setSuccess('Product added successfully!');
+        setSuccess(t('inventory.addProduct.success'));
         setFormData({
             name: '',
             description: '',
@@ -80,7 +82,7 @@ export default function AddProduct() {
         });
         setErrors({});
     } catch (error) {
-        setErrors({ submit: error instanceof Error ? error.message : 'Failed to add product. Please try again.' });
+        setErrors({ submit: error instanceof Error ? error.message : t('inventory.addProduct.title') });
     }
   };
 
@@ -119,7 +121,7 @@ export default function AddProduct() {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-[#011627]">Add New Product</h2>
+        <h2 className="text-xl font-semibold text-[#011627]">{t('inventory.addProduct.title')}</h2>
         <button
           type="button"
           onClick={() => setShowScanner(true)}
@@ -161,7 +163,7 @@ export default function AddProduct() {
 
           <div>
             <label className="block text-sm font-medium text-[#011627] mb-1">
-              Product Name *
+            {t('inventory.addProduct.productName')} *
             </label>
             <input
               type="text"
@@ -179,7 +181,7 @@ export default function AddProduct() {
 
           <div>
             <label className="block text-sm font-medium text-[#011627] mb-1">
-              Description
+            {t('inventory.addProduct.description')}
             </label>
             <textarea
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
@@ -191,7 +193,7 @@ export default function AddProduct() {
 
           <div>
             <label className="block text-sm font-medium text-[#011627] mb-1">
-              Category *
+            {t('inventory.addProduct.category')} *
             </label>
             <select
               required
@@ -199,7 +201,7 @@ export default function AddProduct() {
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             >
-              <option value="">Select a category</option>
+              <option value="">{t('inventory.addProduct.selectCategory')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.name}>
                   {category.name}
@@ -211,7 +213,7 @@ export default function AddProduct() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
-                Price (KSH) *
+              {t('inventory.addProduct.price')} *
               </label>
               <input
                 type="number"
@@ -230,7 +232,7 @@ export default function AddProduct() {
             </div>
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
-                Quantity *
+              {t('inventory.addProduct.quantity')} *
               </label>
               <input
                 type="number"
@@ -251,7 +253,7 @@ export default function AddProduct() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
-                Barcode
+              {t('inventory.addProduct.barcode')}
               </label>
               <div className="flex gap-2">
                 <input
@@ -264,7 +266,7 @@ export default function AddProduct() {
             </div>
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
-                Low Stock Threshold *
+              {t('inventory.addProduct.lowStockThreshold')} *
               </label>
               <input
                 type="number"
@@ -289,7 +291,7 @@ export default function AddProduct() {
           >
             <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
             <p className="text-sm text-gray-500">
-              Drag and drop your product image here, or{' '}
+            {t('inventory.addProduct.uploadImage')}{' '}
               <label className="text-[#2EC4B6] cursor-pointer">
                 browse
                 <input
@@ -312,7 +314,7 @@ export default function AddProduct() {
             className="w-full bg-[#2EC4B6] text-white py-2 px-4 rounded-lg hover:bg-[#28b0a3] transition-colors flex items-center justify-center"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Add Product
+            {t('inventory.addProduct.addButton')}
           </button>
         </form>
 

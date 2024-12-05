@@ -4,8 +4,10 @@ import { Product } from '../../types/inventory';
 import { categories } from '../../data/categories';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 import { inventoryApi } from '../../utils/api';
+import { useTranslation } from 'react-i18next';
 
 export default function ProductList() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [stockFilter, setStockFilter] = useState<string>('');
@@ -67,13 +69,13 @@ export default function ProductList() {
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-[#011627] mb-4">Product Inventory</h2>
+        <h2 className="text-xl font-semibold text-[#011627] mb-4">{t('inventory.productList.title')}</h2>
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t('inventory.productList.searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -85,7 +87,7 @@ export default function ProductList() {
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              <option value="">All Categories</option>
+              <option value="">{t('inventory.productList.allCategories')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -97,10 +99,10 @@ export default function ProductList() {
               value={stockFilter}
               onChange={(e) => setStockFilter(e.target.value)}
             >
-              <option value="">All Stock</option>
-              <option value="low">Low Stock</option>
-              <option value="out">Out of Stock</option>
-              <option value="in">In Stock</option>
+              <option value="">{t('inventory.productList.stockFilter.all')}</option>
+              <option value="low">{t('inventory.productList.stockFilter.low')}</option>
+              <option value="out">{t('inventory.productList.stockFilter.out')}</option>
+              <option value="in">{t('inventory.productList.stockFilter.in')}</option>
             </select>
           </div>
         </div>
@@ -111,22 +113,22 @@ export default function ProductList() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Product
+              {t('inventory.productList.tableHeaders.product')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
+              {t('inventory.productList.tableHeaders.category')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Quantity
+              {t('inventory.productList.tableHeaders.quantity')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Price
+              {t('inventoryproductList..tableHeaders.price')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Updated
+              {t('inventory.productList.tableHeaders.lastUpdated')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+              {t('inventory.productList.tableHeaders.actions')}
               </th>
             </tr>
           </thead>
@@ -171,7 +173,7 @@ export default function ProductList() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{product.quantity}</div>
                   <div className="text-xs text-gray-500">
-                    Min: {product.low_stock_threshold}
+                  {t('inventory.productList.minimum')}: {product.low_stock_threshold}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -184,19 +186,19 @@ export default function ProductList() {
                   <div className="flex justify-end space-x-2">
                     <button
                       className="text-[#2EC4B6] hover:text-[#28b0a3]"
-                      title="View"
+                      title={t('inventory.productList.actions.view')}
                     >
                       <Eye className="w-5 h-5" />
                     </button>
                     <button
                       className="text-[#FF9F1C] hover:text-[#f39200]"
-                      title="Edit"
+                      title={t('inventory.productList.actions.title')}
                     >
                       <Edit2 className="w-5 h-5" />
                     </button>
                     <button
                       className="text-[#E71D36] hover:text-[#c91126]"
-                      title="Delete"
+                      title={t('inventory.productList.actions.delete')}
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
