@@ -5,6 +5,7 @@ import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
 import InventoryManagement from './pages/inventory/InventoryManagement';
 import FloatingLanguageSwitcher from './components/FloatingLanguageSwitcher';
+import SalesManagement from './pages/sales/SalesManagement';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/inventory" element={<InventoryManagement />} />
+        <Route path="/dashboard/sales" element={<SalesManagement />} />
       </Routes>
     </Router>
   );
