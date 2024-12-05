@@ -1,4 +1,29 @@
 {
+  "creditPanel": {
+    "title": "Usimamizi wa Mikopo",
+    "outstanding": "Deni",
+    "paymentsdue": "malipo {{ count }} yanayotakiwa leo",
+    "button": "Simamia Mikopo"
+  },
+  "financialPanel": {
+    "title": "Muhtasari wa Kifedha",
+    "netProfit": "Faida Halisi",
+    "increase": "ongezeko {{percentage}}% mwezi huu",
+    "button": "Tazama Ripoti"
+  },
+  "inventoryPanel": {
+    "title": "Hali ya Bidhaa",
+    "totalItems": "Jumla ya Bidhaa",
+    "lowStock": "malipo {{count}} yanayotakiwa leo",
+    "button": "Ongeza Bidhaa Mpya"
+  },
+  "salesPanel": {
+    "title": "Mauzo ya Leo",
+    "totalSales": "Jumla ya Mauzo",
+    "increase": "ongezeko {{percentage}}% kutoka jana",
+    "button": "Mauzo Mapya"
+  },
+
   "dashboard": {
     "navigation": {
       "dashboard": "Dashibodi",
