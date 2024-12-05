@@ -1,4 +1,62 @@
 {
+  "inventory": {
+    "addProduct": {
+      "title": "Add New Product",
+      "productName": "Product Name",
+      "description": "Description",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "price": "Price (KSH)",
+      "quantity": "Quantity",
+      "barcode": "Barcode",
+      "lowStockThreshold": "Low Stock Threshold",
+      "uploadImage": "Drag and drop your product image here, or",
+      "browse": "browse",
+      "addButton": "Add Product",
+      "success": "Product added successfully!",
+      "error": "Failed to add product. Please try again."
+    },
+    "lowStockAlerts": {
+      "title": "Low Stock Alerts",
+      "export": "Export",
+      "searchPlaceholder": "Search alerts...",
+      "status": {
+        "all": "All Status",
+        "resolved": "Resolved",
+        "unresolved": "Unresolved"
+      },
+      "quantity": "Quantity",
+      "threshold": "Threshold",
+      "created": "Created",
+      "resolveButton": "Resolve"
+    },
+    "productList": {
+      "title": "Product Inventory",
+      "searchPlaceholder": "Search products...",
+      "allCategories": "All Categories",
+      "stockFilter": {
+        "all": "All Stock",
+        "low": "Low Stock",
+        "out": "Out of Stock",
+        "in": "In Stock"
+      },
+      "tableHeaders": {
+        "product": "Product",
+        "category": "Category",
+        "quantity": "Quantity",
+        "price": "Price",
+        "lastUpdated": "Last Updated",
+        "actions": "Actions"
+      },
+      "minimum": "Min",
+      "actions": {
+        "view": "View",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    }
+  },
+  
   "creditPanel": {
     "title": "Credit Management",
     "outstanding": "Outstanding",
