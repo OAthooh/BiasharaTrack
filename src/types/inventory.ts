@@ -7,6 +7,7 @@ export interface Product {
   barcode: string;
   photo_path: string;
   quantity: number;
+  sku: string;
   low_stock_threshold: number;
   created_at: Date;
   updated_at: Date;
