@@ -40,12 +40,17 @@ func main() {
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	router.Use(cors.New(config))
+	router.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
+		c.Next()
+	})
 
 	fmt.Println("Gin router initialized successfully")
 
 	// Register authentication routes
 	routes.AuthRoutes(router, db.DB)
 	routes.InventoryManagementRoutes(router, db.DB)
+	routes.SalesManagementRoutes(router, db.DB)
 
 	fmt.Println("Server is running on port 8080")
 	// Start server on port 8080
