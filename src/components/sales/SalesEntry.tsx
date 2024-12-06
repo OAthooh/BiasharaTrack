@@ -1,15 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Plus, Minus, Trash2, Scan, AlertCircle, Search } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Plus, Minus, Trash2, AlertCircle, Search } from 'lucide-react';
 import { SaleFormData } from '../../types/sales';
 import { Product } from '../../types/inventory';
 import { formatCurrency } from '../../utils/formatters';
 import { useDebounce } from '../../hooks/useDebounce';
-
-
-
-// interface ProductSearchResult extends Product {
-//   matchType: 'name' | 'sku' | 'barcode';
-// }
+import { inventoryApi } from '../../utils/api';
 
 export default function SalesEntry() {
   const [formData, setFormData] = useState<SaleFormData>({
@@ -17,22 +12,18 @@ export default function SalesEntry() {
     paymentMethod: 'cash',
     customerName: '',
     customerPhone: '',
-    amount: '',
     referenceNumber: '',
   });
-  const [selectedProduct, setSelectedProduct] = useState<string>('');
-  const [quantity, setQuantity] = useState<string>('1');
+
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const debouncedSearch = useDebounce(searchQuery, 300);
-  // Add new state for cart total
   const [cartTotal, setCartTotal] = useState(0);
-
-  // Placeholder data - replace with actual API call
-  const products: Product[] = [];
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const searchProducts = async () => {
@@ -42,10 +33,13 @@ export default function SalesEntry() {
 
       setIsSearching(true);
       try {
-        // Replace with actual API call
-        const response = await fetch(`/api/products/search?q=${debouncedSearch}`);
-        const results = await response.json();
-        setSearchResults(results);
+        const response = await inventoryApi.searchProducts(debouncedSearch);
+        console.log('Search response:', response);
+        if (!response.success) {
+          setError('Failed to search products');
+        } else {
+          setSearchResults(response.data || []);
+        }
       } catch (error) {
         console.error('Failed to search products:', error);
       } finally {
@@ -56,87 +50,86 @@ export default function SalesEntry() {
     searchProducts();
   }, [debouncedSearch]);
 
-  // Enhanced product selection handler
   const handleProductSelect = (product: Product, quantity: number = 1) => {
+    if (!product.id) {
+      setError('Invalid product selected');
+      return;
+    }
+
     const existingProduct = formData.products.find(
-      (p) => p.productId === product.id.toString()
+      (p) => p.productId === product.id
     );
 
     if (existingProduct) {
-      handleQuantityChange(product.id.toString(), existingProduct.quantity + quantity);
+      handleQuantityChange(product.id, existingProduct.quantity + quantity);
     } else {
-      setFormData({
-        ...formData,
+      setFormData(prev => ({
+        ...prev,
         products: [
-          ...formData.products,
+          ...prev.products,
           {
-            productId: product.id.toString(),
+            productId: product.id,
             quantity,
+            amount: product.price * quantity,
           },
         ],
-      });
+      }));
+      setSelectedProducts(prev => [...prev, product]);
     }
     setSearchQuery('');
+    setSearchResults([]);
   };
 
-   // New quantity adjustment handler
-   const handleQuantityChange = (productId: string, newQuantity: number) => {
-    const product = products.find(p => p.id.toString() === productId);
-    
+  const handleQuantityChange = (productId: number, newQuantity: number) => {
+    const product = selectedProducts.find(p => p.id === productId);
+
     if (product && newQuantity > product.quantity) {
       setError(`Only ${product.quantity} units available in stock`);
       return;
     }
 
-    setFormData({
-      ...formData,
-      products: formData.products.map(item =>
-        item.productId === productId
-          ? { ...item, quantity: newQuantity }
-          : item
-      ),
-    });
-    updateCartTotal();
-  };
+    if (newQuantity < 1) return;
 
-  // New remove item handler
-  const handleRemoveItem = (productId: string) => {
-    setFormData({
-      ...formData,
-      products: formData.products.filter(item => item.productId !== productId),
-    });
-    updateCartTotal();
-  };
+    const updatedProducts = formData.products.map(item =>
+      item.productId === productId
+        ? { ...item, quantity: newQuantity, amount: product ? product.price * newQuantity : item.amount }
+        : item
+    );
 
-  // Calculate cart total
-  const updateCartTotal = () => {
-    const total = formData.products.reduce((sum, item) => {
-      const product = products.find(p => p.id.toString() === item.productId);
-      return sum + (product?.price || 0) * item.quantity;
+    setFormData(prev => ({
+      ...prev,
+      products: updatedProducts
+    }));
+
+    const newTotal = updatedProducts.reduce((sum, item) => {
+      const prod = selectedProducts.find(p => p.id === item.productId);
+      if (prod) {
+        return sum + (prod.price * item.quantity);
+      }
+      return sum;
     }, 0);
-    setCartTotal(total);
+    
+    setCartTotal(newTotal);
   };
 
-  const handleAddProduct = () => {
-    if (!selectedProduct || parseInt(quantity) <= 0) {
-      setError('Please select a product and enter a valid quantity');
-      return;
-    }
-
-    setFormData({
-      ...formData,
-      products: [
-        ...formData.products,
-        {
-          productId: selectedProduct,
-          quantity: parseInt(quantity),
-        },
-      ],
-    });
-    setSelectedProduct('');
-    setQuantity('1');
-    setError(null);
+  const handleRemoveItem = (productId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      products: prev.products.filter(item => item.productId !== productId),
+    }));
+    setSelectedProducts(prev => prev.filter(p => p.id !== productId));
   };
+
+  useEffect(() => {
+    const newTotal = formData.products.reduce((sum, item) => {
+      const product = selectedProducts.find(p => p.id === item.productId);
+      if (product) {
+        return sum + (product.price * item.quantity);
+      }
+      return sum;
+    }, 0);
+    setCartTotal(newTotal);
+  }, [formData.products, selectedProducts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,16 +139,31 @@ export default function SalesEntry() {
     }
 
     try {
-      // Add API call here
-      setSuccess('Sale recorded successfully!');
-      setFormData({
-        products: [],
-        paymentMethod: 'cash',
-        customerName: '',
-        customerPhone: '',
-        amount: '',
-        referenceNumber: '',
-      });
+      const saleData = {
+        ...formData,
+        payment_method: formData.paymentMethod,
+        products: formData.products.map(product => ({
+          ...product,
+          product_id: product.productId,
+        })),
+      };
+
+      console.log('Submitting sale data:', saleData);
+      const response = await inventoryApi.recordSale(saleData);
+      if (response.success) {
+        setSuccess('Sale recorded successfully!');
+        setFormData({
+          products: [],
+          paymentMethod: 'cash',
+          customerName: '',
+          customerPhone: '',
+          referenceNumber: '',
+        });
+        setSelectedProducts([]);
+        setCartTotal(0);
+      } else {
+        setError('Failed to record sale. Please try again.');
+      }
     } catch (error) {
       setError('Failed to record sale. Please try again.');
     }
@@ -165,7 +173,6 @@ export default function SalesEntry() {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'b') {
         e.preventDefault();
-        // Toggle barcode scanner mode
       }
       if (e.ctrlKey && e.key === 'f') {
         e.preventDefault();
@@ -173,8 +180,18 @@ export default function SalesEntry() {
       }
     };
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchResultsRef.current && !searchResultsRef.current.contains(event.target as Node)) {
+        setSearchResults([]);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+      window.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   return (
@@ -199,7 +216,6 @@ export default function SalesEntry() {
           </div>
         )}
 
-        {/* Product Search Section */}
         <div className="relative">
           <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#2EC4B6] focus-within:border-transparent">
             <Search className="w-5 h-5 text-gray-400 ml-3" />
@@ -212,79 +228,45 @@ export default function SalesEntry() {
             />
           </div>
 
-          {/* Search Results Dropdown */}
           {isSearching && <div className="text-gray-500">Searching...</div>}
           {searchResults.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div
+              ref={searchResultsRef}
+              className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto"
+              style={{ maxHeight: '200px' }}
+            >
               {searchResults.map((product) => (
-                <div 
+                <div
                   key={product.id}
                   onClick={() => handleProductSelect(product)}
                   className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                 >
                   <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">{product.name}</div>
-                      <div className="text-sm text-gray-500">SKU: {product.sku}</div>
+                    <div className="flex gap-3">
+                      {product.photo_path && (
+                        <img 
+                          src={product.photo_path} 
+                          alt={product.name}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                      )}
+                      <div>
+                        <div className="font-medium">{product.name}</div>
+                        <div className="text-sm text-gray-500">Category: {product.category}</div>
+                        <div className="text-sm text-gray-500">Barcode: {product.barcode}</div>
+                      </div>
                     </div>
                     <div className="text-right">
                       <div className="font-medium text-green-600">{formatCurrency(product.price)}</div>
-                      <div className="text-sm text-gray-500">Stock: {product.quantity}</div>
+                      {product.quantity !== undefined && (
+                        <div className="text-sm text-gray-500">Stock: {product.quantity}</div>
+                      )}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-
-        {/* Selected Product Details */}
-        {selectedProduct && (
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-[#011627] mb-1">
-                  Quantity (Available: {products.find(p => p.id.toString() === selectedProduct)?.quantity})
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-                  value={quantity}
-                  onChange={(e) => {
-                    const newQuantity = parseInt(e.target.value);
-                    const product = products.find(p => p.id.toString() === selectedProduct);
-                    if (product && newQuantity > product.quantity) {
-                      setError(`Only ${product.quantity} units available in stock`);
-                    } else {
-                      setError(null);
-                      setQuantity(e.target.value);
-                    }
-                  }}
-                />
-              </div>
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={handleAddProduct}
-                  className="p-2 bg-[#2EC4B6] text-white rounded-lg hover:bg-[#28b0a3] transition-colors"
-                  disabled={!!error}
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="flex gap-4">
-          <button
-            type="button"
-            className="flex items-center gap-2 text-[#2EC4B6] hover:text-[#28b0a3]"
-          >
-            <Scan className="w-5 h-5" />
-            Scan Barcode
-          </button>
         </div>
 
         {formData.products.length > 0 && (
@@ -301,7 +283,7 @@ export default function SalesEntry() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {formData.products.map((item) => {
-                  const product = products.find((p) => p.id.toString() === item.productId);
+                  const product = selectedProducts.find((p) => p.id === item.productId);
                   return (
                     <tr key={item.productId}>
                       <td className="px-4 py-2">{product?.name}</td>
@@ -367,7 +349,6 @@ export default function SalesEntry() {
             </select>
           </div>
 
-          {/* Conditional Fields Based on Payment Method */}
           {formData.paymentMethod === 'mpesa' && (
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
@@ -384,7 +365,6 @@ export default function SalesEntry() {
           )}
         </div>
 
-        {/* Customer Details (Required for Credit) */}
         {formData.paymentMethod === 'credit' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -414,7 +394,7 @@ export default function SalesEntry() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-[#011627] mb-1">
               Amount (Kshs)
@@ -426,7 +406,7 @@ export default function SalesEntry() {
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             />
           </div>
-        </div>
+        </div> */}
 
         <button
           type="submit"
