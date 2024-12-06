@@ -1,4 +1,97 @@
 {
+  "salesEntry": {
+    "title": "Rekodi Mauzo Mapya",
+    "shortcuts": {
+      "title": "Njia za mkato za kibodi:",
+      "focusSearch": "Angazia utafutaji",
+      "barcodeMode": "Hali ya msimbo"
+    },
+    "search": {
+      "placeholder": "Tafuta kwa jina la bidhaa, SKU, au msimbo",
+      "searching": "Inatafuta..."
+    },
+    "product": {
+      "sku": "SKU",
+      "stock": "Hifadhi",
+      "quantity": "Kiasi",
+      "available": "Zinazopatikana",
+      "scanBarcode": "Skana Msimbo"
+    },
+    "table": {
+      "product": "Bidhaa",
+      "quantity": "Kiasi",
+      "price": "Bei",
+      "subtotal": "Jumla ndogo",
+      "actions": "Vitendo",
+      "total": "Jumla"
+    },
+    "payment": {
+      "method": "Njia ya Malipo",
+      "methods": {
+        "cash": "Pesa Taslimu",
+        "mpesa": "M-PESA",
+        "credit": "Mkopo"
+      },
+      "mpesaRef": "Namba ya Muamala wa M-PESA",
+      "amount": "Kiasi (Kshs)"
+    },
+    "customer": {
+      "name": "Jina la Mteja",
+      "phone": "Simu ya Mteja"
+    },
+    "buttons": {
+      "completeSale": "Kamilisha Mauzo"
+    },
+    "messages": {
+      "selectProduct": "Tafadhali chagua bidhaa na uweke kiasi sahihi",
+      "addProduct": "Tafadhali ongeza angalau bidhaa moja",
+      "success": "Mauzo yamerekidiwa kwa mafanikio!",
+      "error": "Imeshindwa kurekodi mauzo. Tafadhali jaribu tena.",
+      "stockLimit": "Kuna vipande {quantity} tu vilivyopo"
+    }
+  },
+  "salesHistory": {
+    "title": "Mauzo ya Hivi Karibuni",
+    "export": "Hamisha",
+    "search": {
+      "placeholder": "Tafuta mauzo..."
+    },
+    "filters": {
+      "status": {
+        "all": "Hali Zote",
+        "completed": "Imekamilika",
+        "pending": "Inasubiri",
+        "refunded": "Imerejeshwa"
+      },
+      "payment": {
+        "all": "Malipo Yote",
+        "cash": "Pesa Taslimu",
+        "mpesa": "M-PESA",
+        "credit": "Mkopo"
+      }
+    },
+    "table": {
+      "saleId": "Namba ya Mauzo",
+      "customer": "Mteja",
+      "amount": "Kiasi",
+      "payment": "Malipo",
+      "status": "Hali",
+      "date": "Tarehe",
+      "actions": "Vitendo"
+    },
+    "customer": {
+      "walkIn": "Mteja wa Kawaida"
+    }
+  },
+  "salesInsights": {
+    "metrics": {
+      "dailyRevenue": "Mapato ya Siku",
+      "weeklyRevenue": "Mapato ya Wiki",
+      "monthlyRevenue": "Mapato ya Mwezi",
+      "topProduct": "Bidhaa Bora"
+    },
+    "units": "vipande"
+  },
   "inventory": {
     "addProduct": {
       "title": "Ongeza Bidhaa Mpya",
@@ -56,7 +149,6 @@
       }
     }
   },
-  
   "creditPanel": {
     "title": "Usimamizi wa Mikopo",
     "outstanding": "Deni",
@@ -81,7 +173,6 @@
     "increase": "ongezeko {{percentage}}% kutoka jana",
     "button": "Mauzo Mapya"
   },
-
   "dashboard": {
     "navigation": {
       "dashboard": "Dashibodi",

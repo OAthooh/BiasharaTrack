@@ -1,4 +1,97 @@
 {
+  "salesEntry": {
+    "title": "Record New Sale",
+    "shortcuts": {
+      "title": "Keyboard shortcuts:",
+      "focusSearch": "Focus search",
+      "barcodeMode": "Barcode mode"
+    },
+    "search": {
+      "placeholder": "Search by product name, SKU, or barcode",
+      "searching": "Searching..."
+    },
+    "product": {
+      "sku": "SKU",
+      "stock": "Stock",
+      "quantity": "Quantity",
+      "available": "Available",
+      "scanBarcode": "Scan Barcode"
+    },
+    "table": {
+      "product": "Product",
+      "quantity": "Quantity",
+      "price": "Price",
+      "subtotal": "Subtotal",
+      "actions": "Actions",
+      "total": "Total"
+    },
+    "payment": {
+      "method": "Payment Method",
+      "methods": {
+        "cash": "Cash",
+        "mpesa": "M-PESA",
+        "credit": "Credit"
+      },
+      "mpesaRef": "M-PESA Transaction Reference",
+      "amount": "Amount (Kshs)"
+    },
+    "customer": {
+      "name": "Customer Name",
+      "phone": "Customer Phone"
+    },
+    "buttons": {
+      "completeSale": "Complete Sale"
+    },
+    "messages": {
+      "selectProduct": "Please select a product and enter a valid quantity",
+      "addProduct": "Please add at least one product",
+      "success": "Sale recorded successfully!",
+      "error": "Failed to record sale. Please try again.",
+      "stockLimit": "Only {quantity} units available in stock"
+    }
+  },
+  "salesHistory": {
+    "title": "Recent Sales",
+    "export": "Export",
+    "search": {
+      "placeholder": "Search sales..."
+    },
+    "filters": {
+      "status": {
+        "all": "All Status",
+        "completed": "Completed",
+        "pending": "Pending",
+        "refunded": "Refunded"
+      },
+      "payment": {
+        "all": "All Payments",
+        "cash": "Cash",
+        "mpesa": "M-PESA",
+        "credit": "Credit"
+      }
+    },
+    "table": {
+      "saleId": "Sale ID",
+      "customer": "Customer",
+      "amount": "Amount",
+      "payment": "Payment",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "customer": {
+      "walkIn": "Walk-in Customer"
+    }
+  },
+  "salesInsights": {
+    "metrics": {
+      "dailyRevenue": "Daily Revenue",
+      "weeklyRevenue": "Weekly Revenue",
+      "monthlyRevenue": "Monthly Revenue",
+      "topProduct": "Top Product"
+    },
+    "units": "units"
+  },
   "inventory": {
     "addProduct": {
       "title": "Add New Product",
@@ -56,7 +149,6 @@
       }
     }
   },
-  
   "creditPanel": {
     "title": "Credit Management",
     "outstanding": "Outstanding",
@@ -81,7 +173,6 @@
     "increase": "{{percentage}}% increase from yesterday",
     "button": "New Sale"
   },
-
   "dashboard": {
     "navigation": {
       "dashboard": "Dashboard",
@@ -103,7 +194,6 @@
       "openSidebar": "Open sidebar"
     }
   },
-  
   "hero": {
     "title": "Empowering Kenya's Informal Traders with Smart Business Tools",
     "subtitle": "Transform your business with our all-in-one solution for inventory management, sales tracking, and financial insights.",
