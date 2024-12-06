@@ -1,3 +1,19 @@
 {
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "biashara-trackdb.clwwxo0qhvvw.us-east-1.rds.amazonaws.com",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "test",
+      "database": "biashara-trackdb",
+      "username": "vinomondi",
+      "askForPassword": true
+    }
+  ]
 }
