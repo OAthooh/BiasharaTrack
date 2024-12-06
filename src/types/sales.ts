@@ -1,16 +1,15 @@
 import { Product } from './inventory';
 
 export interface Sale {
-  id: string;
-  products: SaleProduct[];
-  totalAmount: number;
-  paymentMethod: 'cash' | 'mpesa' | 'credit';
-  status: 'completed' | 'pending' | 'refunded';
+  id: number;
+  product_name: string;
+  product_id: number;
+  quantity: number;
+  total_amount: number;
+  payment_method: 'cash' | 'mpesa' | 'credit';
   customerName?: string;
-  customerPhone?: string;
-  mpesaReference?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface SaleProduct {
@@ -23,13 +22,13 @@ export interface SaleProduct {
 
 export interface SaleFormData {
   products: {
-    productId: string;
+    productId: number;
     quantity: number;
+    amount: number;
   }[];
   paymentMethod: 'cash' | 'mpesa' | 'credit';
   customerName?: string;
   customerPhone?: string;
-  amount?: string;
   referenceNumber?: string;
 }
 
@@ -48,4 +47,16 @@ export interface SalesMetrics {
     mpesa: number;
     credit: number;
   };
+  
 }
+export interface SalesTransaction {
+  id: number;
+  product_name: string;
+  product_id: number;
+  payment_method: 'cash' | 'mpesa' | 'credit';
+  quantity: number;
+  total_amount: number;
+  created_at: Date;
+  updated_at: Date;
+}
+

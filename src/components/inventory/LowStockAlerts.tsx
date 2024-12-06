@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AlertCircle, Search, Download } from 'lucide-react';
 import { StockAlert } from '../../types/inventory';
 import { formatDate } from '../../utils/formatters';
@@ -13,6 +13,7 @@ export default function LowStockAlerts() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'resolved' | 'unresolved'>('all');
   const [alerts, setAlerts] = useState<StockAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const alertsShownRef = useRef(new Set());
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -25,9 +26,15 @@ export default function LowStockAlerts() {
           console.log("response.data", response.data);
           setAlerts(response.data);
           
+          const displayedProductIds = new Set();
           response.data.forEach(alert => {
-            if (!alert.resolved) {
+            if (!alert.resolved && 
+                !displayedProductIds.has(alert.product_id) && 
+                !alertsShownRef.current.has(alert.product_id)) {
+              console.log("alert", alert);
               toast.warning(alert.alert_message);
+              displayedProductIds.add(alert.product_id);
+              alertsShownRef.current.add(alert.product_id);
             }
           });
         }
@@ -40,6 +47,11 @@ export default function LowStockAlerts() {
     };
 
     fetchAlerts();
+
+    // Cleanup function
+    return () => {
+      alertsShownRef.current.clear();
+    };
   }, []);
 
   const filteredAlerts = Array.isArray(alerts) ? alerts.filter((alert) => {

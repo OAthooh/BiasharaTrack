@@ -1,23 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Download, Eye } from 'lucide-react';
-import { Sale } from '../../types/sales';
+import { Sale, SalesTransaction } from '../../types/sales';
 import { formatDate, formatCurrency } from '../../utils/formatters';
+import { inventoryApi } from '../../utils/api';
 
 export default function SalesHistory() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
-  
-  // Placeholder data - replace with actual API call
-  const sales: Sale[] = [];
+  const [sales, setSales] = useState<Sale[]>([]);
+  useEffect(() => {
+    const fetchSales = async () => {
+      const response = await inventoryApi.fetchSalesHistory();
+     
+      if (response.success && Array.isArray(response.data)) {
+        const salesData: Sale[] = response.data.map((transaction: SalesTransaction) => {
+          console.log("transaction", transaction);
+          return {
+            id: transaction.id,
+            product_name: transaction.product_name,
+            product_id: transaction.product_id,
+            quantity: transaction.quantity,
+            total_amount: transaction.total_amount,
+            payment_method: transaction.payment_method.toLowerCase() as "cash" | "mpesa" | "credit",
+            customerName: '',
+            created_at: new Date(transaction.created_at),
+            updated_at: new Date(transaction.updated_at),
+          };
+        });
+        setSales(salesData);
+      } else {
+        setSales([]);
+        console.error('Invalid sales data received:', response);
+      }
+    };
+    fetchSales();
+  }, []);
 
   const filteredSales = sales.filter((sale) => {
-    const matchesSearch = sale.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.customerPhone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.mpesaReference?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || sale.status === statusFilter;
-    const matchesPayment = paymentFilter === 'all' || sale.paymentMethod === paymentFilter;
-    return matchesSearch && matchesStatus && matchesPayment;
+    const matchesSearch = sale.customerName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesPayment = paymentFilter === 'all' || sale.payment_method === paymentFilter;
+    return matchesSearch && matchesPayment;
   });
 
   const handleExport = () => {
@@ -50,16 +72,6 @@ export default function SalesHistory() {
         </div>
         <select
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="all">All Status</option>
-          <option value="completed">Completed</option>
-          <option value="pending">Pending</option>
-          <option value="refunded">Refunded</option>
-        </select>
-        <select
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
           value={paymentFilter}
           onChange={(e) => setPaymentFilter(e.target.value)}
         >
@@ -75,19 +87,16 @@ export default function SalesHistory() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Sale ID
+                Product Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
+                Quantity
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Amount
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Payment
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date
@@ -100,42 +109,28 @@ export default function SalesHistory() {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredSales.map((sale) => (
               <tr key={sale.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  #{sale.id.slice(-6)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{sale.customerName || 'Walk-in Customer'}</div>
-                  {sale.customerPhone && (
-                    <div className="text-sm text-gray-500">{sale.customerPhone}</div>
-                  )}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {sale.product_name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatCurrency(sale.totalAmount)}
+                  {sale.quantity}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {formatCurrency(sale.total_amount)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    sale.paymentMethod === 'cash'
+                    sale.payment_method === 'cash'
                       ? 'bg-green-100 text-green-800'
-                      : sale.paymentMethod === 'mpesa'
+                      : sale.payment_method === 'mpesa'
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {sale.paymentMethod.toUpperCase()}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    sale.status === 'completed'
-                      ? 'bg-green-100 text-green-800'
-                      : sale.status === 'pending'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {sale.status.charAt(0).toUpperCase() + sale.status.slice(1)}
+                    {sale.payment_method.toUpperCase()}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(sale.createdAt)}
+                  {formatDate(sale.created_at)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button

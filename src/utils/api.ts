@@ -1,5 +1,6 @@
 import { Product } from "../types/inventory";
 import { StockAlert } from "../types/inventory";
+import { SaleFormData, SalesTransaction } from "../types/sales";
 
 const API_URL = 'http://localhost:8080';
 
@@ -143,6 +144,79 @@ export const inventoryApi = {
       return {
         success: true,
         data: data as Product
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred'
+      };
+    }
+  }
+  ,
+
+  searchProducts: async (query: string): Promise<ApiResponse<Product[]>> => {
+    try {
+      const response = await fetch(`${API_URL}/search-products?q=${query}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to search products');
+      }
+
+      return {
+        success: true,
+        data: data as Product[]
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred'
+      };
+    }
+  }
+  ,
+
+  recordSale: async (saleData: SaleFormData): Promise<ApiResponse<null>> => {
+    try {
+      console.log("saleData====>",saleData);
+      const response = await fetch(`${API_URL}/record-sale`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(saleData)
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to record sale');
+      }
+
+      return {
+        success: true,
+        data: null
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred'
+      };
+    }
+  }
+  ,
+
+  fetchSalesHistory: async (): Promise<ApiResponse<SalesTransaction[]>> => {
+    try {
+      const response = await fetch(`${API_URL}/sales-history`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch sales history');
+      }
+
+      return {
+        success: true,
+        data: data as SalesTransaction[]
       };
     } catch (error) {
       return {

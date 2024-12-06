@@ -11,6 +11,7 @@ func (d *DB) Migrate() error {
 		&models.LowStockAlert{},
 		&models.Category{},
 		&models.CreditTransaction{},
+		&models.SalesTransaction{},
 	)
 	if err != nil {
 		return err
