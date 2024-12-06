@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, Scan, AlertCircle, Search } from 'lucide-react';
+import { Plus, Minus, Trash2, Scan, AlertCircle, Search } from 'lucide-react';
 import { SaleFormData } from '../../types/sales';
 import { Product } from '../../types/inventory';
 import { formatCurrency } from '../../utils/formatters';
 import { useDebounce } from '../../hooks/useDebounce';
+
 
 
 // interface ProductSearchResult extends Product {
@@ -27,6 +28,8 @@ export default function SalesEntry() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const debouncedSearch = useDebounce(searchQuery, 300);
+  // Add new state for cart total
+  const [cartTotal, setCartTotal] = useState(0);
 
   // Placeholder data - replace with actual API call
   const products: Product[] = [];
@@ -53,9 +56,65 @@ export default function SalesEntry() {
     searchProducts();
   }, [debouncedSearch]);
 
-  const handleProductSelect = (product: Product) => {
-    setSelectedProduct(product.id.toString());
+  // Enhanced product selection handler
+  const handleProductSelect = (product: Product, quantity: number = 1) => {
+    const existingProduct = formData.products.find(
+      (p) => p.productId === product.id.toString()
+    );
+
+    if (existingProduct) {
+      handleQuantityChange(product.id.toString(), existingProduct.quantity + quantity);
+    } else {
+      setFormData({
+        ...formData,
+        products: [
+          ...formData.products,
+          {
+            productId: product.id.toString(),
+            quantity,
+          },
+        ],
+      });
+    }
     setSearchQuery('');
+  };
+
+   // New quantity adjustment handler
+   const handleQuantityChange = (productId: string, newQuantity: number) => {
+    const product = products.find(p => p.id.toString() === productId);
+    
+    if (product && newQuantity > product.quantity) {
+      setError(`Only ${product.quantity} units available in stock`);
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      products: formData.products.map(item =>
+        item.productId === productId
+          ? { ...item, quantity: newQuantity }
+          : item
+      ),
+    });
+    updateCartTotal();
+  };
+
+  // New remove item handler
+  const handleRemoveItem = (productId: string) => {
+    setFormData({
+      ...formData,
+      products: formData.products.filter(item => item.productId !== productId),
+    });
+    updateCartTotal();
+  };
+
+  // Calculate cart total
+  const updateCartTotal = () => {
+    const total = formData.products.reduce((sum, item) => {
+      const product = products.find(p => p.id.toString() === item.productId);
+      return sum + (product?.price || 0) * item.quantity;
+    }, 0);
+    setCartTotal(total);
   };
 
   const handleAddProduct = () => {
@@ -102,8 +161,29 @@ export default function SalesEntry() {
     }
   };
 
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'b') {
+        e.preventDefault();
+        // Toggle barcode scanner mode
+      }
+      if (e.ctrlKey && e.key === 'f') {
+        e.preventDefault();
+        document.querySelector<HTMLInputElement>('input[type="text"]')?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
+      <div className="text-sm text-gray-500 mb-4">
+        <span className="font-medium">Keyboard shortcuts:</span>
+        <span className="ml-2">Ctrl+F: Focus search</span>
+        <span className="ml-2">Ctrl+B: Barcode mode</span>
+      </div>
       <h2 className="text-xl font-semibold text-[#011627] mb-4">Record New Sale</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
@@ -135,14 +215,23 @@ export default function SalesEntry() {
           {/* Search Results Dropdown */}
           {isSearching && <div className="text-gray-500">Searching...</div>}
           {searchResults.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg">
+            <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {searchResults.map((product) => (
                 <div 
                   key={product.id}
                   onClick={() => handleProductSelect(product)}
-                  className="p-2 hover:bg-gray-50 cursor-pointer"
+                  className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                 >
-                  {product.name}
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">{product.name}</div>
+                      <div className="text-sm text-gray-500">SKU: {product.sku}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium text-green-600">{formatCurrency(product.price)}</div>
+                      <div className="text-sm text-gray-500">Stock: {product.quantity}</div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -203,30 +292,60 @@ export default function SalesEntry() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                    Product
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                    Quantity
-                  </th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
-                    Subtotal
-                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Price</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {formData.products.map((item, index) => {
+                {formData.products.map((item) => {
                   const product = products.find((p) => p.id.toString() === item.productId);
                   return (
-                    <tr key={index}>
+                    <tr key={item.productId}>
                       <td className="px-4 py-2">{product?.name}</td>
-                      <td className="px-4 py-2">{item.quantity}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
+                            className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="w-8 text-center">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
+                            className="p-1 text-gray-500 hover:text-gray-700"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 text-right">{formatCurrency(product?.price || 0)}</td>
                       <td className="px-4 py-2 text-right">
                         {formatCurrency((product?.price || 0) * item.quantity)}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(item.productId)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </td>
                     </tr>
                   );
                 })}
+                <tr className="bg-gray-50 font-semibold">
+                  <td colSpan={3} className="px-4 py-2 text-right">Total:</td>
+                  <td className="px-4 py-2 text-right">{formatCurrency(cartTotal)}</td>
+                  <td></td>
+                </tr>
               </tbody>
             </table>
           </div>
