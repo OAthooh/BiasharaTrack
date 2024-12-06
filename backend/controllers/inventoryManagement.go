@@ -379,137 +379,7 @@ func (im *InventoryManagementHandler) GetAllProducts(c *gin.Context) {
 	c.JSON(200, result)
 }
 
-func (im *InventoryManagementHandler) SellProduct(c *gin.Context) {
-	var sellRequest struct {
-		ProductID uint    `json:"product_id" binding:"required"`
-		Quantity  int     `json:"quantity" binding:"required"`
-		Note      string  `json:"note"`
-		SaleType  string  `json:"sale_type"` // "CASH" or "CREDIT"
-		Name      string  `json:"name"`      // Required for credit sales
-		Phone     string  `json:"phone"`     // Optional for credit sales
-		Amount    float64 `json:"amount"`    // Required for credit sales
-	}
 
-	if err := c.ShouldBindJSON(&sellRequest); err != nil {
-		utils.ErrorLogger("Failed to parse sell request: %v", err)
-		c.JSON(400, gin.H{"error": "Invalid request data"})
-		return
-	}
-
-	// Validate credit sale requirements
-	if sellRequest.SaleType == "CREDIT" {
-		if sellRequest.Name == "" || sellRequest.Amount == 0 {
-			utils.WarningLogger("Incomplete credit sale request")
-			c.JSON(400, gin.H{"error": "Name and amount are required for credit sales"})
-			return
-		}
-	}
-
-	// Start transaction
-	tx := im.db.Begin()
-	if tx.Error != nil {
-		utils.ErrorLogger("Failed to start transaction: %v", tx.Error)
-		c.JSON(500, gin.H{"error": "Failed to start transaction"})
-		return
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	// Get current inventory
-	var inventory models.Inventory
-	if err := tx.Where("product_id = ?", sellRequest.ProductID).First(&inventory).Error; err != nil {
-		tx.Rollback()
-		utils.ErrorLogger("Product not found in inventory: %v", err)
-		c.JSON(404, gin.H{"error": "Product not found in inventory"})
-		return
-	}
-
-	// Check if we have enough stock
-	if inventory.Quantity < sellRequest.Quantity {
-		tx.Rollback()
-		utils.WarningLogger("Insufficient stock. Requested: %d, Available: %d",
-			sellRequest.Quantity, inventory.Quantity)
-		c.JSON(400, gin.H{"error": "Insufficient stock"})
-		return
-	}
-
-	// Update inventory
-	inventory.Quantity -= sellRequest.Quantity
-	inventory.LastUpdated = time.Now()
-	if err := tx.Save(&inventory).Error; err != nil {
-		tx.Rollback()
-		utils.ErrorLogger("Failed to update inventory: %v", err)
-		c.JSON(500, gin.H{"error": "Failed to update inventory"})
-		return
-	}
-
-	// Record stock movement
-	stockMovement := models.StockMovement{
-		ProductID:      sellRequest.ProductID,
-		ChangeType:     sellRequest.SaleType,
-		QuantityChange: -sellRequest.Quantity,
-		Note:           sellRequest.Note,
-		CreatedAt:      time.Now(),
-	}
-
-	if err := tx.Create(&stockMovement).Error; err != nil {
-		tx.Rollback()
-		utils.ErrorLogger("Failed to create stock movement: %v", err)
-		c.JSON(500, gin.H{"error": "Failed to record stock movement"})
-		return
-	}
-
-	// Handle credit sale
-	if sellRequest.SaleType == "CREDIT" {
-		creditTx := models.CreditTransaction{
-			ProductID:    sellRequest.ProductID,
-			Name:         sellRequest.Name,
-			PhoneNumber:  sellRequest.Phone,
-			Quantity:     sellRequest.Quantity,
-			CreditAmount: sellRequest.Amount,
-			Status:       "unpaid",
-		}
-
-		if err := tx.Create(&creditTx).Error; err != nil {
-			tx.Rollback()
-			utils.ErrorLogger("Failed to create credit transaction: %v", err)
-			c.JSON(500, gin.H{"error": "Failed to record credit transaction"})
-			return
-		}
-	}
-
-	// Check for low stock alert
-	if inventory.Quantity <= inventory.LowStockThreshold {
-		var product models.Product
-		if err := tx.First(&product, sellRequest.ProductID).Error; err == nil {
-			alert := models.LowStockAlert{
-				ProductID:    sellRequest.ProductID,
-				AlertMessage: fmt.Sprintf("Product stock is low. Current quantity: %d", inventory.Quantity),
-				Resolved:     false,
-				CreatedAt:    time.Now(),
-			}
-
-			if err := tx.Create(&alert).Error; err != nil {
-				utils.ErrorLogger("Failed to create low stock alert: %v", err)
-			}
-		}
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		utils.ErrorLogger("Failed to commit transaction: %v", err)
-		c.JSON(500, gin.H{"error": "Failed to complete sale"})
-		return
-	}
-
-	utils.InfoLogger("Successfully sold %d units of product %d", sellRequest.Quantity, sellRequest.ProductID)
-	c.JSON(200, gin.H{
-		"message":      "Sale recorded successfully",
-		"new_quantity": inventory.Quantity,
-	})
-}
 
 func isAllowedImageType(file multipart.File) bool {
 	buffer := make([]byte, 512)
@@ -538,11 +408,15 @@ func (im *InventoryManagementHandler) GetLowStockAlerts(c *gin.Context) {
 		StockThreshold  int    `json:"stock_threshold"`
 	}
 
+	// Using MySQL compatible syntax
 	if err := im.db.Table("low_stock_alerts").
 		Select("low_stock_alerts.*, products.name as product_name, inventory.quantity as current_quantity, inventory.low_stock_threshold as stock_threshold").
 		Joins("JOIN products ON low_stock_alerts.product_id = products.id").
 		Joins("JOIN inventory ON products.id = inventory.product_id").
-		Order("low_stock_alerts.created_at DESC").
+		Where("low_stock_alerts.id IN (?)",
+			im.db.Table("low_stock_alerts").
+				Select("MAX(id)").
+				Group("product_id")).
 		Find(&alerts).Error; err != nil {
 		utils.ErrorLogger("Failed to fetch alerts: %v", err)
 		c.JSON(500, gin.H{"error": "Failed to fetch alerts"})
@@ -590,4 +464,32 @@ func (im *InventoryManagementHandler) LookupBarcode(c *gin.Context) {
 		"success": true,
 		"data":    product,
 	})
+}
+
+func (im *InventoryManagementHandler) SearchProducts(c *gin.Context) {
+	query := c.Query("q")
+	if query == "" {
+		c.JSON(400, gin.H{"error": "Search query is required"})
+		return
+	}
+
+	utils.InfoLogger("Searching products with query: %s", query)
+
+	var products []struct {
+		models.Product
+		Quantity int `json:"quantity"`
+	}
+	err := im.db.Table("products").
+		Select("products.*, inventory.quantity").
+		Joins("left join inventory on inventory.product_id = products.id").
+		Where("products.name LIKE ? OR products.description LIKE ? OR products.barcode LIKE ?", 
+		"%"+query+"%", "%"+query+"%", "%"+query+"%").
+		Find(&products).Error
+	if err != nil {
+		utils.ErrorLogger("Failed to search products: %v", err)
+		c.JSON(500, gin.H{"error": "Failed to search products"})
+		return
+	}
+
+	c.JSON(200, products)
 }
