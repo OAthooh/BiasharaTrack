@@ -10,8 +10,10 @@ require (
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/jwambugu/mpesa-golang-sdk v1.0.8 // indirect
 	gorm.io/gorm v1.25.7 // indirect
 )
 
