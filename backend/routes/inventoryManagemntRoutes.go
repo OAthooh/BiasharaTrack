@@ -16,7 +16,7 @@ func InventoryManagementRoutes(router *gin.Engine, db *gorm.DB) {
 	router.DELETE("/delete-product/:id", im.DeleteProduct)
 	router.GET("/get-product/:id", im.GetProduct)
 	router.GET("/get-all-products", im.GetAllProducts)
-	router.POST("/sell-product", im.SellProduct)
 	router.GET("/get-low-stock-alerts", im.GetLowStockAlerts)
-	router.GET("/lookup-barcode/", im.LookupBarcode)
+	router.GET("/lookup-barcode/:barcode", im.LookupBarcode)
+	router.GET("/search-products", im.SearchProducts)
 }
