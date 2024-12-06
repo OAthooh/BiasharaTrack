@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 interface User {
   id: number;
@@ -11,8 +11,10 @@ interface LoginCredentials {
   password: string;
 }
 
-interface RegisterCredentials extends LoginCredentials {
+interface RegisterCredentials {
   fullName: string;
+  email: string;
+  password: string;
 }
 
 interface AuthResponse {
@@ -21,14 +23,15 @@ interface AuthResponse {
   user: User;
 }
 
-const API_URL = 'http://localhost:8080';
-
-export const useAuth = () => {
+export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
+  // Changed initial loading to false since we're not doing any initial fetch
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const login = async (credentials: LoginCredentials): Promise<void> => {
+  const API_URL = 'http://localhost:8080';
+
+  const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       setLoading(true);
       setError(null);
@@ -40,29 +43,31 @@ export const useAuth = () => {
         },
         body: JSON.stringify(credentials),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Login failed');
       }
-
+  
       const data: AuthResponse = await response.json();
       setUser(data.user);
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       
     } catch (err) {
-      console.log("Login error", err);
-      setError(err instanceof Error ? err.message : 'An error occurred during login');
+      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setError(errorMessage);
+      throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const register = async (credentials: RegisterCredentials): Promise<void> => {
+  const register = useCallback(async (credentials: RegisterCredentials): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
-
+      
       const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
@@ -79,54 +84,56 @@ export const useAuth = () => {
       const data: AuthResponse = await response.json();
       setUser(data.user);
       localStorage.setItem('token', data.token);
-
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
     } catch (err) {
-      console.log("Register error", err);
-      setError(err instanceof Error ? err.message : 'An error occurred during registration');
+      const errorMessage = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      setError(errorMessage);
+      throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
+    setError(null);
     localStorage.removeItem('token');
-  };
+    localStorage.removeItem('user');
+  }, []);
 
-  const checkAuth = (): void => {
+  const checkAuth = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setUser(null);
       return;
     }
 
-    setLoading(true);
-    console.log("token", token);
-    fetch(`${API_URL}/verify-token`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(errorData => {
-            throw new Error(errorData.error || 'Token verification failed');
-          });
-        }
-        return response.json();
-      })
-      .then(({ user: userData }) => {
-        setUser(userData);
-      })
-      .catch(err => {
-        console.log("Token verification error", err);
-        setError(err instanceof Error ? err.message : 'Token verification failed');
-        logout();
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/verify-token`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-  };
+
+      if (!response.ok) {
+        throw new Error('Token verification failed');
+      }
+
+      const { user: userData } = await response.json();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Authentication check failed';
+      setError(errorMessage);
+      // Clear everything if token verification fails
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  }, [logout]);
 
   return {
     user,
@@ -135,6 +142,6 @@ export const useAuth = () => {
     login,
     register,
     logout,
-    checkAuth,
+    checkAuth
   };
-};
+}
