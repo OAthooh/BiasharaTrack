@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, Download, Eye } from 'lucide-react';
 import { Sale } from '../../types/sales';
 import { formatDate, formatCurrency } from '../../utils/formatters';
