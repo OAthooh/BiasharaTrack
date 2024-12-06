@@ -46,6 +46,14 @@ func main() {
 	// Register authentication routes
 	routes.AuthRoutes(router, db.DB)
 	routes.InventoryManagementRoutes(router, db.DB)
+	routes.MpesaRoutes(router, db.DB)
+
+	// Add a test route to verify the router is working
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 
 	fmt.Println("Server is running on port 8080")
 	// Start server on port 8080
