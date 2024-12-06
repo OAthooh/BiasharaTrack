@@ -82,7 +82,7 @@ export default function AddProduct() {
         });
         setErrors({});
     } catch (error) {
-        setErrors({ submit: error instanceof Error ? error.message : t('inventory.addProduct.title') });
+        setErrors({ submit: error instanceof Error ? error.message : t('inventory.addProduct.error') });
     }
   };
 
