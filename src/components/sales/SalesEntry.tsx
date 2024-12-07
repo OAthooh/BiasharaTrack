@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Scan, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Scan, AlertCircle, Loader2 } from 'lucide-react';
 import { SaleFormData } from '../../types/sales';
 import { Product } from '../../types/inventory';
 import { formatCurrency } from '../../utils/formatters';
@@ -17,9 +17,21 @@ export default function SalesEntry() {
   const [quantity, setQuantity] = useState<string>('1');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isProcessingMpesa, setIsProcessingMpesa] = useState(false);
+  const [mpesaStatus, setMpesaStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
+  const [totalAmount, setTotalAmount] = useState(0);
 
   // Placeholder data - replace with actual API call
   const products: Product[] = [];
+
+  useEffect(() => {
+    const total = formData.products.reduce((sum, item) => {
+      const product = products.find(p => p.id.toString() === item.productId);
+      return sum + (product?.price || 0) * item.quantity;
+    }, 0);
+    setTotalAmount(total);
+    setFormData(prev => ({ ...prev, amount: total.toString() }));
+  }, [formData.products]);
 
   const handleAddProduct = () => {
     if (!selectedProduct || parseInt(quantity) <= 0) {
@@ -63,6 +75,133 @@ export default function SalesEntry() {
     } catch (error) {
       setError('Failed to record sale. Please try again.');
     }
+  };
+
+  const handleMpesaPayment = async () => {
+    if (!formData.customerPhone || !formData.amount) {
+      setError('Phone number and amount are required for M-PESA payments');
+      return;
+    }
+
+    const phoneRegex = /^(?:254|\+254|0)?(7\d{8})$/;
+    if (!phoneRegex.test(formData.customerPhone)) {
+      setError('Please enter a valid Kenyan phone number');
+      return;
+    }
+
+    setIsProcessingMpesa(true);
+    setMpesaStatus('pending');
+
+    try {
+      const formattedPhone = formData.customerPhone.startsWith('254') 
+        ? formData.customerPhone 
+        : `254${formData.customerPhone.replace(/^0|^\+254|^254/, '')}`;
+
+      const response = await fetch('http://localhost:8080/api/mpesa/initiate', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone_number: formattedPhone,
+          amount: parseFloat(formData.amount),
+          reference: `INV-${Date.now()}`,
+          description: `Payment for ${formData.products.length} items`
+        })
+      });
+
+      const data = await response.json();
+      console.log('M-PESA Response:', data); // Add this for debugging
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to initiate payment');
+      }
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to initiate payment');
+      }
+
+      setMpesaStatus('success');
+      setFormData(prev => ({ 
+        ...prev, 
+        referenceNumber: data.data?.CheckoutRequestID || data.data?.MerchantRequestID || 'PENDING'
+      }));
+      setSuccess('M-PESA payment initiated. Please check your phone to complete the payment.');
+    } catch (error) {
+      console.error('M-PESA payment error:', error);
+      setMpesaStatus('failed');
+      setError(error instanceof Error ? error.message : 'Failed to initiate M-PESA payment');
+    } finally {
+      setIsProcessingMpesa(false);
+    }
+  };
+
+  const renderPaymentFields = () => {
+    if (formData.paymentMethod === 'mpesa') {
+      return (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#011627] mb-1">
+                M-PESA Phone Number *
+              </label>
+              <input
+                type="tel"
+                required
+                placeholder="254XXXXXXXXX"
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent ${
+                  !formData.customerPhone ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={formData.customerPhone || ''}
+                onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
+              />
+              {!formData.customerPhone && (
+                <p className="mt-1 text-sm text-red-500">Phone number is required</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#011627] mb-1">
+                Amount (KES)
+              </label>
+              <input
+                type="text"
+                readOnly
+                className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg"
+                value={formatCurrency(totalAmount)}
+              />
+            </div>
+          </div>
+          
+          <button
+            type="button"
+            disabled={isProcessingMpesa || mpesaStatus === 'success' || !formData.customerPhone}
+            onClick={handleMpesaPayment}
+            className="w-full bg-[#2EC4B6] text-white py-2 px-4 rounded-lg hover:bg-[#28b0a3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isProcessingMpesa ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Processing M-PESA...
+              </>
+            ) : mpesaStatus === 'success' ? (
+              'Payment Initiated ✓'
+            ) : (
+              'Initiate M-PESA Payment'
+            )}
+          </button>
+
+          {mpesaStatus === 'success' && (
+            <div className="bg-green-50 p-4 rounded-lg">
+              <p className="text-sm text-green-700">
+                Please check your phone to complete the M-PESA payment. Once completed, click "Complete Sale" below.
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    return null;
   };
 
   return (
@@ -151,7 +290,7 @@ export default function SalesEntry() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {formData.products.map((item, index) => {
-                  const product = products.find((p) => p.id === item.productId);
+                  const product = products.find((p) => p.id.toString() === item.productId);
                   return (
                     <tr key={index}>
                       <td className="px-4 py-2">{product?.name}</td>
@@ -183,6 +322,8 @@ export default function SalesEntry() {
             </select>
           </div>
         </div>
+
+        {renderPaymentFields()}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
