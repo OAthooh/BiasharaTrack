@@ -94,7 +94,9 @@
     },
     "customer": {
       "name": "Jina la Mteja",
-      "phone": "Namba ya Simu ya Mteja"
+      "phone": "Namba ya Simu ya Mteja",
+      "amount": "Jumla ya kiasi",
+      "amountPaid": "Kiasi kilicholipwa"
     },
     "buttons": {
       "completeSale": "Kamilisha Mauzo"

@@ -94,7 +94,9 @@
     },
     "customer": {
       "name": "Customer Name",
-      "phone": "Customer Phone"
+      "phone": "Customer Phone",
+      "amount": "Total Amount",
+      "amountPaid": "Amount Paid"
     },
     "buttons": {
       "completeSale": "Complete Sale"

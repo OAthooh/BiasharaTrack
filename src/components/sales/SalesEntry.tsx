@@ -343,7 +343,7 @@ export default function SalesEntry() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-[#011627] mb-1">
-                  Customer Name *
+                {t('salesEntry.customer.name')} *
                 </label>
                 <input
                   type="text"
@@ -355,7 +355,7 @@ export default function SalesEntry() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#011627] mb-1">
-                  Customer Phone *
+                {t('salesEntry.customer.phone')} *
                 </label>
                 <input
                   type="tel"
@@ -370,7 +370,7 @@ export default function SalesEntry() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-[#011627] mb-1">
-                  Total Amount
+                {t('salesEntry.customer.amount')}
                 </label>
                 <input
                   type="text"
@@ -381,7 +381,7 @@ export default function SalesEntry() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#011627] mb-1">
-                  Amount Paid *
+                {t('salesEntry.customer.amountPaid')} *
                 </label>
                 <input
                   type="number"
