@@ -1,5 +1,6 @@
 import { Clock, AlertCircle } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { useTranslation } from 'react-i18next';
 
 interface Payment {
   id: string;
@@ -10,13 +11,14 @@ interface Payment {
 }
 
 export default function UpcomingPayments() {
+  const { t } = useTranslation();
   // Replace with actual data from your API
   const payments: Payment[] = [];
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-[#011627]">Upcoming Payments</h2>
+        <h2 className="text-lg font-semibold text-[#011627]">{t('credits.upcomingPayments.title')}</h2>
         <Clock className="h-5 w-5 text-[#2EC4B6]" />
       </div>
       <div className="space-y-4">
@@ -33,7 +35,7 @@ export default function UpcomingPayments() {
                   {payment.customerName}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  Due: {formatDate(payment.dueDate)}
+                {t('credits.upcomingPayments.due')}: {formatDate(payment.dueDate)}
                 </p>
               </div>
               <div className="text-right">
@@ -43,7 +45,7 @@ export default function UpcomingPayments() {
                 {payment.isOverdue && (
                   <div className="flex items-center text-red-600 text-xs mt-1">
                     <AlertCircle className="w-4 h-4 mr-1" />
-                    Overdue
+                    {t('credits.upcomingPayments.overdue')}
                   </div>
                 )}
               </div>
@@ -52,7 +54,7 @@ export default function UpcomingPayments() {
         ))}
         {payments.length === 0 && (
           <p className="text-sm text-gray-500 text-center py-4">
-            No upcoming payments
+            {t('credits.upcomingPayments.noPayments')}
           </p>
         )}
       </div>

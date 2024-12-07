@@ -1,7 +1,10 @@
 import { DollarSign, Users, Clock, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
+import { useTranslation } from 'react-i18next';
 
 export default function CreditMetrics() {
+  const { t } = useTranslation();
+
   // Replace with actual data from your API
   const metrics = {
     totalOutstanding: 125000,
@@ -12,28 +15,28 @@ export default function CreditMetrics() {
 
   const cards = [
     {
-      title: 'Total Outstanding',
+      title: t('creditMetrics.totalOutstanding'),
       value: formatCurrency(metrics.totalOutstanding),
       icon: DollarSign,
       color: 'text-[#2EC4B6]',
       bgColor: 'bg-[#2EC4B6]/10'
     },
     {
-      title: 'Active Credit Accounts',
+      title: t('creditMetrics.activeAccounts'),
       value: metrics.activeAccounts,
       icon: Users,
       color: 'text-[#FF9F1C]',
       bgColor: 'bg-[#FF9F1C]/10'
     },
     {
-      title: 'Overdue Accounts',
+      title: t('creditMetrics.overdueAccounts'),
       value: metrics.overdueAccounts,
       icon: AlertTriangle,
       color: 'text-[#E71D36]',
       bgColor: 'bg-[#E71D36]/10'
     },
     {
-      title: 'Upcoming Payments',
+      title: t('creditMetrics.upcomingPayments'),
       value: metrics.upcomingPayments,
       icon: Clock,
       color: 'text-[#2EC4B6]',
