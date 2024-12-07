@@ -1,4 +1,3 @@
-import React from 'react';
 import { DollarSign, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
