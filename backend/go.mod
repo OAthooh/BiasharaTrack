@@ -5,14 +5,16 @@ go 1.21.1
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	gorm.io/gorm v1.25.7
 )
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	gorm.io/gorm v1.25.7 // indirect
+	github.com/jwambugu/mpesa-golang-sdk v1.0.8 // indirect
+	github.com/kr/text v0.2.0 // indirect
 )
 
 require (
