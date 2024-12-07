@@ -35,10 +35,10 @@ func NewMpesaClient(consumerKey, consumerSecret string, isSandbox bool) *MpesaCl
 	return &MpesaClient{
 		app: app,
 		config: Config{
-			ConsumerKey:    consumerKey,
-			ConsumerSecret: consumerSecret,
-			PassKey:       os.Getenv("MPESA_PASSKEY"),
-			CallbackURL:   os.Getenv("CALLBACK_URL"),
+			ConsumerKey:       consumerKey,
+			ConsumerSecret:    consumerSecret,
+			PassKey:           os.Getenv("MPESA_PASSKEY"),
+			CallbackURL:       os.Getenv("CALLBACK_URL"),
 			BusinessShortCode: os.Getenv("MPESA_BUSINESS_SHORTCODE"),
 		},
 	}
@@ -53,7 +53,7 @@ type STKPushRequest struct {
 }
 
 // validatePhoneNumber validates and converts a phone number to uint64
-func validatePhoneNumber(phoneNumber string) (uint64, error) {
+func ValidatePhoneNumber(phoneNumber string) (uint64, error) {
 	// Remove any spaces or hyphens
 	phoneNumber = strings.ReplaceAll(phoneNumber, " ", "")
 	phoneNumber = strings.ReplaceAll(phoneNumber, "-", "")
@@ -87,7 +87,7 @@ func (m *MpesaClient) InitiateSTKPush(req STKPushRequest) (*mpesasdk.Response, e
 	defer cancel()
 
 	// Convert and validate phone number
-	phoneNumber, err := validatePhoneNumber(req.PhoneNumber)
+	phoneNumber, err := ValidatePhoneNumber(req.PhoneNumber)
 	if err != nil {
 		return nil, fmt.Errorf("phone number validation failed: %v", err)
 	}
@@ -103,7 +103,7 @@ func (m *MpesaClient) InitiateSTKPush(req STKPushRequest) (*mpesasdk.Response, e
 		TransactionType:   mpesasdk.CustomerPayBillOnlineTransactionType,
 		Amount:            req.Amount,
 		PartyA:            uint(phoneNumber),
-		PartyB:            174379, // Should come from config
+		PartyB:            uint(businessShortCode),
 		PhoneNumber:       phoneNumber,
 		CallBackURL:       m.config.CallbackURL,
 		AccountReference:  req.Reference,
