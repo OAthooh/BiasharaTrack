@@ -6,6 +6,7 @@ import { formatCurrency } from '../../utils/formatters';
 import { useDebounce } from '../../hooks/useDebounce';
 import { inventoryApi } from '../../utils/api';
 import { useTranslation } from 'react-i18next';
+// import { motion } from "framer-motion"
 
 export default function SalesEntry() {
   const { t } = useTranslation();
