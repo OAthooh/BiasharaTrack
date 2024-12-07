@@ -13,8 +13,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!isAuthenticated) {
-    console.log("Not authenticated", isAuthenticated);
-    return <Navigate to="/login" />;
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return children;
