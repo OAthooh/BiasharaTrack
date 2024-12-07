@@ -1,5 +1,6 @@
 {
   "salesEntry": {
+    "title1": "Sales Management",
     "title": "Record New Sale",
     "shortcuts": {
       "title": "Keyboard shortcuts:",
@@ -280,6 +281,7 @@
       "rememberMe": "Remember me",
       "forgotPassword": "Forgot your password?",
       "submit": "Sign in",
+      "loading": "Loading...",
       "imageAlt": "Kenyan Market Scene"
     },
     "signup": {
