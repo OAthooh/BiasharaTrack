@@ -29,7 +29,7 @@ export default function Login() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t('auth.login.loading')}</div>;
   }
 
   if (isAuthenticated) {

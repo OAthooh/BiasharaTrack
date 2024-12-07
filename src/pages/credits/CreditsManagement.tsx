@@ -3,12 +3,15 @@ import CreditMetrics from '../../components/credits/CreditMetrics';
 import CustomerCreditList from '../../components/credits/CustomerCreditList';
 import UpcomingPayments from '../../components/credits/UpcomingPayments';
 import CreditTerms from '../../components/credits/CreditTerms';
+import { useTranslation } from 'react-i18next';
 
 export default function CreditsManagement() {
+  const { t } = useTranslation();
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-[#011627]">Credit Management</h1>
+        <h1 className="text-2xl font-bold text-[#011627]">{t('creditPanel.title')}</h1>
         {/* <p>Debug: Page is rendering</p> */}
         
         {typeof CreditMetrics === 'function' && <CreditMetrics />}
