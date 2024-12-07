@@ -1,4 +1,94 @@
 {
+  "salesEntry": {
+    "title": "Rekodi Mauzo Mapya",
+    "shortcuts": {
+      "title": "Njia za mkato:",
+      "focusSearch": "Angazia utafutaji",
+      "barcodeMode": "Hali ya msimbo"
+    },
+    "search": {
+      "placeholder": "Tafuta kwa jina la bidhaa, SKU, au msimbo",
+      "searching": "Inatafuta..."
+    },
+    "product": {
+      "name": "Jina la Bidhaa",
+      "sku": "SKU",
+      "stock": "Hifadhi",
+      "category": "Kategoria",
+      "barcode": "Msimbo",
+      "quantity": "Kiasi",
+      "price": "Bei",
+      "available": "Zinazopatikana"
+    },
+    "table": {
+      "product": "Bidhaa",
+      "quantity": "Kiasi",
+      "price": "Bei",
+      "subtotal": "Jumla ndogo",
+      "total": "Jumla",
+      "actions": "Vitendo"
+    },
+    "payment": {
+      "method": "Njia ya Malipo",
+      "methods": {
+        "cash": "Pesa Taslimu",
+        "mpesa": "M-PESA",
+        "credit": "Mkopo"
+      },
+      "mpesaRef": "Namba ya Muamala wa M-PESA",
+      "amount": "Kiasi (KSH)"
+    },
+    "customer": {
+      "name": "Jina la Mteja",
+      "phone": "Namba ya Simu ya Mteja"
+    },
+    "buttons": {
+      "completeSale": "Kamilisha Mauzo"
+    },
+    "messages": {
+      "selectProduct": "Tafadhali chagua bidhaa na uweke kiasi sahihi",
+      "addProduct": "Tafadhali ongeza angalau bidhaa moja",
+      "success": "Mauzo yamerekidiwa kwa mafanikio!",
+      "error": "Imeshindwa kurekodi mauzo. Tafadhali jaribu tena.",
+      "stockLimit": "Kuna vipande {quantity} tu vilivyopo"
+    }
+  },
+  "salesHistory": {
+    "title": "Mauzo ya Hivi Karibuni",
+    "export": "Hamisha",
+    "search": {
+      "placeholder": "Tafuta mauzo..."
+    },
+    "filters": {
+      "payment": {
+        "all": "Malipo Yote",
+        "cash": "Pesa Taslimu",
+        "mpesa": "M-PESA",
+        "credit": "Mkopo"
+      }
+    },
+    "table": {
+      "productName": "Jina la Bidhaa",
+      "quantity": "Wingi",
+      "amount": "Kiasi",
+      "payment": "Malipo",
+      "date": "Tarehe",
+      "actions": "Vitendo"
+    }
+  },
+  "salesInsights": {
+    "metrics": {
+      "dailyRevenue": "Mapato ya Siku",
+      "weeklyRevenue": "Mapato ya Wiki",
+      "monthlyRevenue": "Mapato ya Mwezi",
+      "topProduct": "Bidhaa Bora"
+    },
+    "units": "vipande",
+    "changes": {
+      "increase": "ongezeko",
+      "decrease": "punguzo"
+    }
+  },
   "inventory": {
     "addProduct": {
       "title": "Ongeza Bidhaa Mpya",
