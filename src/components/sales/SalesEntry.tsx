@@ -276,7 +276,7 @@ export default function SalesEntry() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-[#011627] mb-1">
-                  M-PESA Phone Number *
+                {t('salesEntry.messages.phoneLabel')} *
                 </label>
                 <input
                   type="tel"
@@ -289,12 +289,12 @@ export default function SalesEntry() {
                   onChange={(e) => handlePhoneChange(e.target.value)}
                 />
                 {!formData.customerPhone && (
-                  <p className="mt-1 text-sm text-red-500">Phone number is required</p>
+                  <p className="mt-1 text-sm text-red-500">{t('salesEntry.messages.phoneRequired')}</p>
                 )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#011627] mb-1">
-                  Amount (KES)
+                {t('salesEntry.messages.amountLabel')}
                 </label>
                 <input
                   type="text"
@@ -314,19 +314,19 @@ export default function SalesEntry() {
               {isProcessingMpesa ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Processing M-PESA...
+                  {t('salesEntry.messages.processing')}
                 </>
               ) : mpesaStatus === 'success' ? (
-                'Payment Initiated ✓'
+                t('salesEntry.messages.initiated')  // "Payment Initiated ✓"
               ) : (
-                'Initiate M-PESA Payment'
+                t('salesEntry.messages.initiateButton')  // "Initiate M-PESA Payment"
               )}
             </button>
 
             {mpesaStatus === 'success' && (
               <div className="bg-green-50 p-4 rounded-lg">
                 <p className="text-sm text-green-700">
-                  Please check your phone to complete the M-PESA payment. Once completed, click "Complete Sale" below.
+                {t('salesEntry.messages.checkPhone')}
                 </p>
               </div>
             )}
