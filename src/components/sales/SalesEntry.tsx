@@ -148,10 +148,14 @@ export default function SalesEntry() {
       const saleData = {
         ...formData,
         payment_method: formData.paymentMethod,
+        customer_name: formData.customerName,
+        customer_phone: formData.customerPhone,
         products: formData.products.map(product => ({
           ...product,
           product_id: product.productId,
         })),
+        amount_paid: formData.paymentMethod === 'credit' ? formData.amount : undefined,
+        remaining_balance: formData.paymentMethod === 'credit' ? cartTotal - formData.amount : undefined,
       };
 
       console.log('Submitting sale data:', saleData);
