@@ -2,13 +2,14 @@
 package controllers
 
 import (
-	"github.com/OAthooh/BiasharaTrack.git/mpesa"
+	"fmt"
+
 	"github.com/OAthooh/BiasharaTrack.git/models"
+	"github.com/OAthooh/BiasharaTrack.git/mpesa"
 	"github.com/OAthooh/BiasharaTrack.git/utils"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	mpesasdk "github.com/jwambugu/mpesa-golang-sdk"
-	"fmt"
+	"gorm.io/gorm"
 )
 
 type MpesaHandler struct {
@@ -22,7 +23,7 @@ func NewMpesaHandler(db *gorm.DB, config mpesa.Config) *MpesaHandler {
 		config.ConsumerSecret,
 		config.Environment == "sandbox",
 	)
-	
+
 	return &MpesaHandler{
 		db:     db,
 		client: client,
@@ -31,6 +32,9 @@ func NewMpesaHandler(db *gorm.DB, config mpesa.Config) *MpesaHandler {
 
 // InitiatePayment handles STK push requests
 func (h *MpesaHandler) InitiatePayment(c *gin.Context) {
+	// Set response headers
+	c.Header("Content-Type", "application/json")
+
 	var req struct {
 		PhoneNumber string  `json:"phone_number" binding:"required"`
 		Amount      float64 `json:"amount" binding:"required"`
@@ -40,11 +44,28 @@ func (h *MpesaHandler) InitiatePayment(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ErrorLogger("Invalid request payload: %v", err)
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{
+			"success": false,
+			"message": "Invalid request payload",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// Validate amount
+	if req.Amount <= 0 {
+		c.JSON(400, gin.H{
+			"success": false,
+			"message": "Invalid amount",
+			"error": "Amount must be greater than 0",
+		})
 		return
 	}
 
 	utils.InfoLogger("Initiating STK push for phone: %s, amount: %.2f", req.PhoneNumber, req.Amount)
+
+	// Log the request for debugging
+	fmt.Printf("Request data: %+v\n", req)
 
 	resp, err := h.client.InitiateSTKPush(mpesa.STKPushRequest{
 		PhoneNumber: req.PhoneNumber,
@@ -55,12 +76,28 @@ func (h *MpesaHandler) InitiatePayment(c *gin.Context) {
 
 	if err != nil {
 		utils.ErrorLogger("Failed to initiate STK push: %v", err)
-		c.JSON(500, gin.H{"error": fmt.Sprintf("Failed to initiate payment: %v", err)})
+		c.JSON(500, gin.H{
+			"success": false,
+			"message": "Failed to initiate payment",
+			"error": err.Error(),
+		})
 		return
 	}
 
-	utils.InfoLogger("STK push initiated successfully: %+v", resp)
-	c.JSON(200, resp)
+	// Log the response for debugging
+	fmt.Printf("M-PESA Response: %+v\n", resp)
+
+	c.JSON(200, gin.H{
+		"success": true,
+		"message": "Payment initiated successfully",
+		"data": gin.H{
+			"CheckoutRequestID":   resp.CheckoutRequestID,
+			"MerchantRequestID":   resp.MerchantRequestID,
+			"ResponseCode":        resp.ResponseCode,
+			"ResponseDescription": resp.ResponseDescription,
+			"CustomerMessage":     resp.CustomerMessage,
+		},
+	})
 }
 
 // HandleCallback processes M-Pesa payment callbacks
@@ -84,13 +121,13 @@ func (h *MpesaHandler) HandleCallback(c *gin.Context) {
 		MerchantRequestID: stkCallback.MerchantRequestID,
 		CheckoutRequestID: stkCallback.CheckoutRequestID,
 		ResultCode:        stkCallback.ResultCode,
-		Status:           "PENDING",
+		Status:            "PENDING",
 	}
 
 	// Process successful transaction
 	if stkCallback.ResultCode == 0 {
 		transaction.Status = "SUCCESS"
-		
+
 		// Extract transaction details from callback metadata
 		for _, item := range stkCallback.CallbackMetadata.Item {
 			switch item.Name {
@@ -125,7 +162,7 @@ func (h *MpesaHandler) HandleCallback(c *gin.Context) {
 
 	utils.InfoLogger("Successfully processed M-Pesa callback for transaction: %s", transaction.ID)
 	c.JSON(200, gin.H{
-		"status": "success",
+		"status":  "success",
 		"message": "Callback processed successfully",
 	})
-} 
+}
