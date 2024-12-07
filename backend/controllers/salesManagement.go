@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/OAthooh/BiasharaTrack.git/models"
@@ -28,11 +29,13 @@ type SellRequest struct {
 
 // Define the structure for the sale data from the front end
 type SaleData struct {
-	Products        []SellRequest `json:"products" binding:"required"`
-	PaymentMethod   string        `json:"payment_method"`
-	CustomerName    string        `json:"customer_name"`
-	CustomerPhone   string        `json:"customer_phone"`
-	ReferenceNumber string        `json:"reference_number"`
+	Products         []SellRequest `json:"products" binding:"required"`
+	PaymentMethod    string        `json:"payment_method"`
+	CustomerName     string        `json:"customer_name"`
+	CustomerPhone    string        `json:"customer_phone"`
+	ReferenceNumber  string        `json:"reference_number"`
+	AmountPaid       float64       `json:"amount_paid"`
+	RemainingBalance float64       `json:"remaining_balance"`
 }
 
 func (im *SalesManagementHandler) SellProducts(c *gin.Context) {
@@ -69,13 +72,14 @@ func (im *SalesManagementHandler) SellProducts(c *gin.Context) {
 	}
 
 	// Validate credit sale requirements
-	if saleData.PaymentMethod == "CREDIT" {
+	if strings.ToUpper(saleData.PaymentMethod) == "CREDIT" {
 		if saleData.CustomerName == "" || saleData.CustomerPhone == "" {
 			utils.WarningLogger("Incomplete credit sale request for product %d", saleData.Products[0].ProductID)
 			c.JSON(400, gin.H{"error": fmt.Sprintf("Name and phone number are required for credit sales for product %d", saleData.Products[0].ProductID)})
 			return
 		}
 	}
+
 	utils.InfoLogger("Processing sale for product %s", saleData.PaymentMethod)
 
 	processSales(saleData, im, c)
@@ -142,13 +146,14 @@ func processSales(saleData SaleData, im *SalesManagementHandler, c *gin.Context)
 		}
 
 		// Handle credit sale
-		if saleData.PaymentMethod == "CREDIT" {
+		if strings.ToUpper(saleData.PaymentMethod) == "CREDIT" {
 			creditTx := models.CreditTransaction{
 				ProductID:    sellRequest.ProductID,
 				Name:         saleData.CustomerName,
 				PhoneNumber:  saleData.CustomerPhone,
 				Quantity:     sellRequest.Quantity,
 				CreditAmount: sellRequest.Amount,
+				BalanceDue:   saleData.RemainingBalance,
 				Status:       "unpaid",
 			}
 
