@@ -1,4 +1,47 @@
 {
+  "creditMetrics": {
+    "totalOutstanding": "Jumla ya Deni",
+    "activeAccounts": "Akaunti za Mkopo Zinazotumika",
+    "overdueAccounts": "Akaunti Zilizochelewa",
+    "upcomingPayments": "Malipo Yanayokuja"
+  },
+  "credits": {
+    "terms": {
+      "title": "Masharti ya Mkopo",
+      "maxCreditPeriod": "Kipindi cha Juu cha Mkopo (Siku)",
+      "interestRate": "Kiwango cha Riba (%)",
+      "lateFee": "Ada ya Kuchelewa Kulipa (KSH)",
+      "days": "siku",
+      "saveChanges": "Hifadhi Mabadiliko"
+    },
+    "customerList": {
+      "title": "Mikopo ya Wateja",
+      "searchPlaceholder": "Tafuta wateja...",
+      "allStatus": "Hali Zote",
+      "active": "Inafanya kazi",
+      "overdue": "Imepitiliza",
+      "paid": "Imelipwa",
+      "tableHeaders": {
+        "customer": "Mteja",
+        "totalCredit": "Jumla ya Mkopo",
+        "balanceDue": "Salio la Kulipa",
+        "lastPayment": "Malipo ya Mwisho",
+        "status": "Hali",
+        "actions": "Vitendo"
+      },
+      "actions": {
+        "viewDetails": "Tazama Maelezo",
+        "recordPayment": "Rekodi Malipo",
+        "sendReminder": "Tuma Ukumbusho"
+      }
+    },
+    "upcomingPayments": {
+      "title": "Malipo Yanayokuja",
+      "due": "Tarehe ya Kulipa",
+      "overdue": "Imechelewa",
+      "noPayments": "Hakuna malipo yanayokuja"
+    }
+  },
   "categories": {
     "food": "Vyakula na Vinywaji",
     "electronics": "Vifaa vya Elektroniki",
@@ -156,7 +199,6 @@
       }
     }
   },
-  
   "creditPanel": {
     "title": "Usimamizi wa Mikopo",
     "outstanding": "Deni",
@@ -181,7 +223,6 @@
     "increase": "ongezeko {{percentage}}% kutoka jana",
     "button": "Mauzo Mapya"
   },
-
   "dashboard": {
     "navigation": {
       "dashboard": "Dashibodi",
