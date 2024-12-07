@@ -1,5 +1,6 @@
 {
   "salesEntry": {
+    "title1": "Usimamizi wa Mauzo",
     "title": "Rekodi Mauzo Mapya",
     "shortcuts": {
       "title": "Njia za mkato:",
@@ -279,6 +280,7 @@
       "rememberMe": "Nikumbuke",
       "forgotPassword": "Umesahau nywila?",
       "submit": "Ingia",
+      "loading": "Kupakia...",
       "imageAlt": "Mandhari ya Soko la Kenya"
     },
     "signup": {
