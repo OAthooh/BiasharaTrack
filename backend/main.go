@@ -48,14 +48,10 @@ func main() {
 
 	// Configure CORS
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5173", callbackURL} 
+	config.AllowOrigins = []string{"http://localhost:5173", callbackURL}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	router.Use(cors.New(config))
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Server is running!"})
-	})
-	
 
 	fmt.Println("Gin router initialized successfully")
 
@@ -64,6 +60,7 @@ func main() {
 	routes.InventoryManagementRoutes(router, db.DB)
 	routes.SalesManagementRoutes(router, db.DB)
 	routes.MpesaRoutes(router, db.DB)
+	routes.CreditRoutes(router, db.DB)
 
 	fmt.Println("Server is running on port 8080")
 	// Start server on port 8080
