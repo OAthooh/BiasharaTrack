@@ -64,3 +64,28 @@ INFO: 2024/12/06 19:58:06 log.go:39: Successfully fetched all products
 INFO: 2024/12/06 20:34:37 log.go:39: Successfully fetched all products
 INFO: 2024/12/06 20:37:48 log.go:39: Successfully fetched all products
 INFO: 2024/12/06 20:37:50 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:44:39 log.go:39: Successful login for user: cliff@gmail.com
+INFO: 2024/12/06 20:45:28 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:45:31 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:49:40 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:49:42 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:50:23 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:50:25 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:51:42 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:51:44 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:57:13 log.go:39: Successful login for user: cliff@gmail.com
+INFO: 2024/12/06 20:57:43 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 20:57:45 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:04:54 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:04:57 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:20:26 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:20:27 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:21:22 log.go:39: Successful login for user: cliff@gmail.com
+INFO: 2024/12/06 21:27:12 log.go:39: Successful login for user: cliff@gmail.com
+INFO: 2024/12/06 21:30:21 log.go:39: Successful login for user: cliff@gmail.com
+WARNING: 2024/12/06 21:34:48 log.go:44: Registration attempt with existing email: s.athooh@gmail.com
+INFO: 2024/12/06 21:35:03 log.go:39: Successful login for user: s.athooh@gmail.com
+INFO: 2024/12/06 21:35:34 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:35:36 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:36:45 log.go:39: Successfully fetched all products
+INFO: 2024/12/06 21:36:47 log.go:39: Successfully fetched all products

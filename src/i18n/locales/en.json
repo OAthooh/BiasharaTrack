@@ -1,4 +1,94 @@
 {
+  "salesEntry": {
+    "title": "Record New Sale",
+    "shortcuts": {
+      "title": "Keyboard shortcuts:",
+      "focusSearch": "Focus search",
+      "barcodeMode": "Barcode mode"
+    },
+    "search": {
+      "placeholder": "Search by product name, SKU, or barcode",
+      "searching": "Searching..."
+    },
+    "product": {
+      "name": "Product Name",
+      "sku": "SKU",
+      "stock": "Stock",
+      "category": "Category",
+      "barcode": "Barcode",
+      "quantity": "Quantity",
+      "price": "Price",
+      "available": "Available"
+    },
+    "table": {
+      "product": "Product",
+      "quantity": "Quantity",
+      "price": "Price",
+      "subtotal": "Subtotal",
+      "total": "Total",
+      "actions": "Actions"
+    },
+    "payment": {
+      "method": "Payment Method",
+      "methods": {
+        "cash": "Cash",
+        "mpesa": "M-PESA",
+        "credit": "Credit"
+      },
+      "mpesaRef": "M-PESA Transaction Reference",
+      "amount": "Amount (KSH)"
+    },
+    "customer": {
+      "name": "Customer Name",
+      "phone": "Customer Phone"
+    },
+    "buttons": {
+      "completeSale": "Complete Sale"
+    },
+    "messages": {
+      "selectProduct": "Please select a product and enter a valid quantity",
+      "addProduct": "Please add at least one product",
+      "success": "Sale recorded successfully!",
+      "error": "Failed to record sale. Please try again.",
+      "stockLimit": "Only {quantity} units available in stock"
+    }
+  },
+  "salesHistory": {
+    "title": "Recent Sales",
+    "export": "Export",
+    "search": {
+      "placeholder": "Search sales..."
+    },
+    "filters": {
+      "payment": {
+        "all": "All Payments",
+        "cash": "Cash",
+        "mpesa": "M-PESA",
+        "credit": "Credit"
+      }
+    },
+    "table": {
+      "productName": "Product Name",
+      "quantity": "Quantity",
+      "amount": "Amount",
+      "payment": "Payment",
+      "date": "Date",
+      "actions": "Actions"
+    }
+  },
+  "salesInsights": {
+    "metrics": {
+      "dailyRevenue": "Daily Revenue",
+      "weeklyRevenue": "Weekly Revenue",
+      "monthlyRevenue": "Monthly Revenue",
+      "topProduct": "Top Product"
+    },
+    "units": "units",
+    "changes": {
+      "increase": "increase",
+      "decrease": "decrease"
+    }
+  },
   "inventory": {
     "addProduct": {
       "title": "Add New Product",

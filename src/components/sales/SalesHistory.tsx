@@ -3,8 +3,10 @@ import { Search, Download, Eye } from 'lucide-react';
 import { Sale, SalesTransaction } from '../../types/sales';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 import { inventoryApi } from '../../utils/api';
+import { useTranslation } from 'react-i18next';
 
 export default function SalesHistory() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [sales, setSales] = useState<Sale[]>([]);
@@ -49,13 +51,13 @@ export default function SalesHistory() {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-[#011627]">Recent Sales</h2>
+        <h2 className="text-xl font-semibold text-[#011627]">{t('salesHistory.title')}</h2>
         <button
           onClick={handleExport}
           className="flex items-center text-[#2EC4B6] hover:text-[#28b0a3]"
         >
           <Download className="w-5 h-5 mr-2" />
-          Export
+          {t('salesHistory.export')}
         </button>
       </div>
 
@@ -64,7 +66,7 @@ export default function SalesHistory() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search sales..."
+            placeholder={t('salesHistory.search.placeholder')}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -75,10 +77,10 @@ export default function SalesHistory() {
           value={paymentFilter}
           onChange={(e) => setPaymentFilter(e.target.value)}
         >
-          <option value="all">All Payments</option>
-          <option value="cash">Cash</option>
-          <option value="mpesa">M-PESA</option>
-          <option value="credit">Credit</option>
+          <option value="all">{t('salesHistory.filters.payment.all')}</option>
+          <option value="cash">{t('salesHistory.filters.payment.cash')}</option>
+          <option value="mpesa">{t('salesHistory.filters.payment.mpesa')}</option>
+          <option value="credit">{t('salesHistory.filters.payment.credit')}</option>
         </select>
       </div>
 
@@ -87,22 +89,22 @@ export default function SalesHistory() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Product Name
+              {t('salesHistory.table.productName')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Quantity
+              {t('salesHistory.table.quantity')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
+              {t('salesHistory.table.amount')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Payment
+              {t('salesHistory.table.payment')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
+              {t('salesHistory.table.date')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+              {t('salesHistory.table.actions')}
               </th>
             </tr>
           </thead>
