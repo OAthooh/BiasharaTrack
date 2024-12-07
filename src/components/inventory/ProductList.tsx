@@ -49,19 +49,19 @@ export default function ProductList() {
   const filteredProducts = products.filter((product) => {
     if (!product || !product.name) return false;
 
-    const matchesSearch = 
+    const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (product.barcode && product.barcode.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+
     const matchesCategory = !selectedCategory || product.category === selectedCategory;
-    
+
     const matchesStock = !stockFilter || (
       stockFilter === 'low' ? product.quantity <= product.low_stock_threshold :
-      stockFilter === 'out' ? product.quantity === 0 :
-      stockFilter === 'in' ? product.quantity > product.low_stock_threshold :
-      true
+        stockFilter === 'out' ? product.quantity === 0 :
+          stockFilter === 'in' ? product.quantity > product.low_stock_threshold :
+            true
     );
-    
+
     return matchesSearch && matchesCategory && matchesStock;
   });
 
@@ -97,7 +97,7 @@ export default function ProductList() {
               <option value="">{t('inventory.productList.allCategories')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name}
+                  {t(`categories.${category.id}`)}
                 </option>
               ))}
             </select>
@@ -120,22 +120,22 @@ export default function ProductList() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {t('inventory.productList.tableHeaders.product')}
+                {t('inventory.productList.tableHeaders.product')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {t('inventory.productList.tableHeaders.category')}
+                {t('inventory.productList.tableHeaders.category')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {t('inventory.productList.tableHeaders.quantity')}
+                {t('inventory.productList.tableHeaders.quantity')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {t('inventory.productList.tableHeaders.price')}
+                {t('inventory.productList.tableHeaders.price')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {t('inventory.productList.tableHeaders.lastUpdated')}
+                {t('inventory.productList.tableHeaders.lastUpdated')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {t('inventory.productList.tableHeaders.actions')}
+                {t('inventory.productList.tableHeaders.actions')}
               </th>
             </tr>
           </thead>
@@ -148,8 +148,8 @@ export default function ProductList() {
                     product.quantity === 0
                       ? 'bg-red-50'
                       : product.quantity <= product.low_stock_threshold
-                      ? 'bg-yellow-50'
-                      : ''
+                        ? 'bg-yellow-50'
+                        : ''
                   }
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -181,7 +181,7 @@ export default function ProductList() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{product.quantity}</div>
                     <div className="text-xs text-gray-500">
-                    {t('inventory.productList.minimum')}: {product.low_stock_threshold}
+                      {t('inventory.productList.minimum')}: {product.low_stock_threshold}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
