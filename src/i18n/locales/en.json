@@ -1,4 +1,13 @@
 {
+  "categories": {
+    "food": "Food & Beverages",
+    "electronics": "Electronics",
+    "clothing": "Clothing & Accessories",
+    "household": "Household Items",
+    "health": "Health & Beauty",
+    "stationery": "Stationery",
+    "other": "Other"
+  },
   "salesEntry": {
     "title1": "Sales Management",
     "title": "Record New Sale",

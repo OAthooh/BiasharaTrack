@@ -1,4 +1,13 @@
 {
+  "categories": {
+    "food": "Vyakula na Vinywaji",
+    "electronics": "Vifaa vya Elektroniki",
+    "clothing": "Nguo na Vifaa vya Mapambo",
+    "household": "Vifaa vya Nyumbani",
+    "health": "Afya na Urembo",
+    "stationery": "Vifaa vya Kuandikia",
+    "other": "Vingine"
+  },
   "salesEntry": {
     "title1": "Usimamizi wa Mauzo",
     "title": "Rekodi Mauzo Mapya",
