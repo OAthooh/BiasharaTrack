@@ -32,7 +32,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     { name: t('dashboard.navigation.inventory'), icon: Package, href: '/dashboard/inventory' },
     { name: t('dashboard.navigation.sales'), icon: ShoppingCart, href: '/dashboard/sales' },
     { name: t('dashboard.navigation.analytics'), icon: BarChart2, href: '/dashboard/analytics' },
-    { name: t('dashboard.navigation.credit'), icon: Users, href: '/dashboard/credit' },
+    { name: t('dashboard.navigation.credit'), icon: Users, href: '/dashboard/credits' },
     { name: t('dashboard.navigation.reports'), icon: FileText, href: '/dashboard/reports' },
     { name: t('dashboard.navigation.tutorials'), icon: Video, href: '/dashboard/tutorials' },
     { name: t('dashboard.navigation.settings'), icon: Settings, href: '/dashboard/settings' },
