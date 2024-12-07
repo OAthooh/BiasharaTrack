@@ -1,4 +1,47 @@
 {
+  "creditMetrics": {
+    "totalOutstanding": "Total Outstanding",
+    "activeAccounts": "Active Credit Accounts",
+    "overdueAccounts": "Overdue Accounts",
+    "upcomingPayments": "Upcoming Payments"
+  },
+  "credits": {
+    "terms": {
+      "title": "Credit Terms",
+      "maxCreditPeriod": "Maximum Credit Period (Days)",
+      "interestRate": "Interest Rate (%)",
+      "lateFee": "Late Payment Fee (KSH)",
+      "days": "days",
+      "saveChanges": "Save Changes"
+    },
+    "customerList": {
+      "title": "Customer Credits",
+      "searchPlaceholder": "Search customers...",
+      "allStatus": "All Status",
+      "active": "Active",
+      "overdue": "Overdue",
+      "paid": "Paid",
+      "tableHeaders": {
+        "customer": "Customer",
+        "totalCredit": "Total Credit",
+        "balanceDue": "Balance Due",
+        "lastPayment": "Last Payment",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "recordPayment": "Record Payment",
+        "sendReminder": "Send Reminder"
+      }
+    },
+    "upcomingPayments": {
+      "title": "Upcoming Payments",
+      "due": "Due",
+      "overdue": "Overdue",
+      "noPayments": "No upcoming payments"
+    }
+  },
   "categories": {
     "food": "Food & Beverages",
     "electronics": "Electronics",
@@ -156,7 +199,6 @@
       }
     }
   },
-  
   "creditPanel": {
     "title": "Credit Management",
     "outstanding": "Outstanding",
@@ -181,7 +223,6 @@
     "increase": "{{percentage}}% increase from yesterday",
     "button": "New Sale"
   },
-
   "dashboard": {
     "navigation": {
       "dashboard": "Dashboard",
@@ -203,7 +244,6 @@
       "openSidebar": "Open sidebar"
     }
   },
-  
   "hero": {
     "title": "Empowering Kenya's Informal Traders with Smart Business Tools",
     "subtitle": "Transform your business with our all-in-one solution for inventory management, sales tracking, and financial insights.",
