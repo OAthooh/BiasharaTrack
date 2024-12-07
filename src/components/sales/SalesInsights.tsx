@@ -1,4 +1,3 @@
-import React from 'react';
 import { TrendingUp, DollarSign, CreditCard, ShoppingBag } from 'lucide-react';
 import { SalesMetrics } from '../../types/sales';
 import { formatCurrency } from '../../utils/formatters';

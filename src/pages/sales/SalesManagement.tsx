@@ -1,4 +1,3 @@
-import React from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import SalesEntry from '../../components/sales/SalesEntry';
 import SalesHistory from '../../components/sales/SalesHistory';
