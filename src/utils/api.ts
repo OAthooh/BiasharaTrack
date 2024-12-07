@@ -1,6 +1,7 @@
 import { Product } from "../types/inventory";
 import { StockAlert } from "../types/inventory";
 import { SaleFormData, SalesTransaction } from "../types/sales";
+import { CreditCustomer } from "../types/credits";
 
 const API_URL = 'http://localhost:8080';
 
@@ -217,6 +218,28 @@ export const inventoryApi = {
       return {
         success: true,
         data: data as SalesTransaction[]
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred'
+      };
+    }
+  }
+  ,
+
+  fetchCreditHistory: async (): Promise<ApiResponse<CreditCustomer[]>> => {
+    try {
+      const response = await fetch(`${API_URL}/credit-history`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch credit history');
+      }
+
+      return {
+        success: true,
+        data: data as CreditCustomer[]
       };
     } catch (error) {
       return {
