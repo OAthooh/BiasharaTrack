@@ -293,7 +293,7 @@ export default function AddProduct() {
             <p className="text-sm text-gray-500">
             {t('inventory.addProduct.uploadImage')}{' '}
               <label className="text-[#2EC4B6] cursor-pointer">
-                browse
+              {t('inventory.addProduct.browse')}
                 <input
                   type="file"
                   className="hidden"
