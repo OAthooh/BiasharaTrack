@@ -89,7 +89,8 @@
         "credit": "Credit"
       },
       "mpesaRef": "M-PESA Transaction Reference",
-      "amount": "Amount (KSH)"
+      "amount": "Amount (KSH)",
+      "mpesaNo": "M-PESA Phone Number"
     },
     "customer": {
       "name": "Customer Name",
@@ -103,7 +104,14 @@
       "addProduct": "Please add at least one product",
       "success": "Sale recorded successfully!",
       "error": "Failed to record sale. Please try again.",
-      "stockLimit": "Only {quantity} units available in stock"
+      "stockLimit": "Only {quantity} units available in stock",
+      "phoneLabel": "M-PESA Phone Number",
+      "phoneRequired": "Phone number is required",
+      "amountLabel": "Amount (KES)",
+      "initiateButton": "Initiate M-PESA Payment",
+      "processing": "Processing M-PESA...",
+      "initiated": "Payment Initiated ✓Payment Initiated ✓",
+      "checkPhone": "Please check your phone to complete the M-PESA payment. Once completed, click \"Complete Sale\" below."
     }
   },
   "salesHistory": {
