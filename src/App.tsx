@@ -7,6 +7,7 @@ import InventoryManagement from './pages/inventory/InventoryManagement';
 import FloatingLanguageSwitcher from './components/FloatingLanguageSwitcher';
 import ProtectedRoute from './context/ProtectedRoute';
 import SalesManagement from './pages/sales/SalesManagement';
+import CreditsManagement from './pages/credits/CreditsManagement';
 
 function App() {
   return (
@@ -37,6 +38,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SalesManagement />
+            </ProtectedRoute>
+          } 
+        />
+      <Route 
+          path="/dashboard/credits" 
+          element={
+            <ProtectedRoute>
+              <CreditsManagement />
             </ProtectedRoute>
           } 
         />
