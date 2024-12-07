@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, MessageCircle, Eye, DollarSign } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { inventoryApi } from '../../utils/api';
 
 interface CreditCustomer {
   id: string;
@@ -8,16 +9,49 @@ interface CreditCustomer {
   phone: string;
   totalCredit: number;
   balanceDue: number;
-  lastPaymentDate: Date;
+  lastPaymentDate: string | null;
   status: 'active' | 'overdue' | 'paid';
 }
 
 export default function CustomerCreditList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [customers, setCustomers] = useState<CreditCustomer[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Replace with actual data from your API
-  const customers: CreditCustomer[] = [];
+  useEffect(() => {
+    const fetchCreditCustomers = async () => {
+      try {
+        setLoading(true);
+        const response = await inventoryApi.fetchCreditHistory();
+        console.log('Credit customers response:', response);
+
+        if (response.success && Array.isArray(response.data)) {
+          const validatedCustomers = response.data.map((customer: any) => ({
+            id: customer.id || '',
+            name: customer.name || '',
+            phone: customer.phone || '',
+            totalCredit: Number(customer.total_credit) || 0,
+            balanceDue: Number(customer.balance_due) || 0,
+            lastPaymentDate: customer.last_payment_date || null,
+            status: customer.status || 'active'
+          }));
+          
+          setCustomers(validatedCustomers);
+        } else {
+          setError(response.error || 'Failed to fetch credit customers');
+        }
+      } catch (err) {
+        console.error('Error fetching credit customers:', err);
+        setError('An error occurred while fetching credit customers');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCreditCustomers();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -39,6 +73,14 @@ export default function CustomerCreditList() {
     const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="bg-white rounded-lg shadow">
