@@ -89,7 +89,8 @@
         "credit": "Mkopo"
       },
       "mpesaRef": "Namba ya Muamala wa M-PESA",
-      "amount": "Kiasi (KSH)"
+      "amount": "Kiasi (KSH)",
+      "mpesaNo": "Nambari ya M-PESA"
     },
     "customer": {
       "name": "Jina la Mteja",
@@ -103,7 +104,14 @@
       "addProduct": "Tafadhali ongeza angalau bidhaa moja",
       "success": "Mauzo yamerekidiwa kwa mafanikio!",
       "error": "Imeshindwa kurekodi mauzo. Tafadhali jaribu tena.",
-      "stockLimit": "Kuna vipande {quantity} tu vilivyopo"
+      "stockLimit": "Kuna vipande {quantity} tu vilivyopo",
+      "phoneLabel": "Namba ya Simu ya M-PESA",
+      "phoneRequired": "Namba ya simu inahitajika",
+      "amountLabel": "Kiasi (KES)",
+      "initiateButton": "Anza Malipo ya M-PESA",
+      "processing": "Inashughulikia M-PESA...",
+      "initiated": "Malipo Yameanzishwa ✓",
+      "checkPhone": "Tafadhali angalia simu yako kukamilisha malipo ya M-PESA. Ukisha, bonyeza \"Kamilisha Mauzo\" hapa chini."
     }
   },
   "salesHistory": {
