@@ -27,9 +27,10 @@ export interface SaleFormData {
     amount: number;
   }[];
   paymentMethod: 'cash' | 'mpesa' | 'credit';
-  customerName?: string;
-  customerPhone?: string;
-  referenceNumber?: string;
+  customerName: string;
+  customerPhone: string;
+  referenceNumber: string;
+  amount: number;
 }
 
 export interface SalesMetrics {

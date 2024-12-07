@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Minus, Trash2, AlertCircle, Search } from 'lucide-react';
+import { Plus, Minus, Trash2, AlertCircle, Search, Loader2 } from 'lucide-react';
 import { SaleFormData } from '../../types/sales';
 import { Product } from '../../types/inventory';
 import { formatCurrency } from '../../utils/formatters';
 import { useDebounce } from '../../hooks/useDebounce';
 import { inventoryApi } from '../../utils/api';
 import { useTranslation } from 'react-i18next';
+// import { motion } from "framer-motion"
 
 export default function SalesEntry() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function SalesEntry() {
     customerName: '',
     customerPhone: '',
     referenceNumber: '',
+    amount: 0,
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +28,8 @@ export default function SalesEntry() {
   const [cartTotal, setCartTotal] = useState(0);
   const searchResultsRef = useRef<HTMLDivElement>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [isProcessingMpesa, setIsProcessingMpesa] = useState(false);
+  const [mpesaStatus, setMpesaStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
 
   useEffect(() => {
     const searchProducts = async () => {
@@ -160,6 +164,7 @@ export default function SalesEntry() {
           customerName: '',
           customerPhone: '',
           referenceNumber: '',
+          amount: 0,
         });
         setSelectedProducts([]);
         setCartTotal(0);
@@ -195,6 +200,236 @@ export default function SalesEntry() {
       window.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const handleMpesaPayment = async () => {
+    setError(null);
+
+    if (!formData.customerPhone || !cartTotal) {
+      setError('Phone number and amount are required for M-PESA payments');
+      return;
+    }
+
+    const phoneRegex = /^(?:254|\+254|0)?(7\d{8})$/;
+    if (!phoneRegex.test(formData.customerPhone)) {
+      setError('Please enter a valid Kenyan phone number');
+      return;
+    }
+
+    setIsProcessingMpesa(true);
+    setMpesaStatus('pending');
+
+    try {
+      const formattedPhone = formData.customerPhone.startsWith('254') 
+        ? formData.customerPhone 
+        : `254${formData.customerPhone.replace(/^0|^\+254|^254/, '')}`;
+
+      const response = await fetch('http://localhost:8080/api/mpesa/initiate', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone_number: formattedPhone,
+          amount: cartTotal,
+          reference: `INV-${Date.now()}`,
+          description: `Payment for ${formData.products.length} items
+`        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to initiate payment');
+      }
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to initiate payment');
+      }
+
+      setMpesaStatus('success');
+      setFormData(prev => ({ 
+        ...prev, 
+        referenceNumber: data.data?.CheckoutRequestID || data.data?.MerchantRequestID || 'PENDING'
+      }));
+      setSuccess('M-PESA payment initiated. Please check your phone to complete the payment.');
+    } catch (error) {
+      console.error('M-PESA payment error:', error);
+      setMpesaStatus('failed');
+      setError(error instanceof Error ? error.message : 'Failed to initiate M-PESA payment');
+    } finally {
+      setIsProcessingMpesa(false);
+    }
+  };
+
+  const handlePhoneChange = (value: string) => {
+    if (error?.includes('phone number') || error?.includes('Phone number')) {
+      setError(null);
+    }
+    setFormData(prev => ({ ...prev, customerPhone: value }));
+  };
+
+  const renderPaymentFields = () => {
+    switch (formData.paymentMethod) {
+      case 'mpesa':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#011627] mb-1">
+                  M-PESA Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="254XXXXXXXXX"
+                  className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent ${
+                    !formData.customerPhone ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  value={formData.customerPhone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                />
+                {!formData.customerPhone && (
+                  <p className="mt-1 text-sm text-red-500">Phone number is required</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#011627] mb-1">
+                  Amount (KES)
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg"
+                  value={formatCurrency(cartTotal)}
+                />
+              </div>
+            </div>
+            
+            <button
+              type="button"
+              disabled={isProcessingMpesa || mpesaStatus === 'success' || !formData.customerPhone}
+              onClick={handleMpesaPayment}
+              className="w-full bg-[#2EC4B6] text-white py-2 px-4 rounded-lg hover:bg-[#28b0a3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessingMpesa ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Processing M-PESA...
+                </>
+              ) : mpesaStatus === 'success' ? (
+                'Payment Initiated ✓'
+              ) : (
+                'Initiate M-PESA Payment'
+              )}
+            </button>
+
+            {mpesaStatus === 'success' && (
+              <div className="bg-green-50 p-4 rounded-lg">
+                <p className="text-sm text-green-700">
+                  Please check your phone to complete the M-PESA payment. Once completed, click "Complete Sale" below.
+                </p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'credit':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#011627] mb-1">
+                  Customer Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                  value={formData.customerName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, customerName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#011627] mb-1">
+                  Customer Phone *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                  value={formData.customerPhone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#011627] mb-1">
+                  Total Amount
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg"
+                  value={formatCurrency(cartTotal)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#011627] mb-1">
+                  Amount Paid *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  max={cartTotal}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                  value={formData.amount || ''}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value);
+                    if (value > cartTotal) {
+                      setError('Amount paid cannot exceed total amount');
+                      return;
+                    }
+                    setFormData(prev => ({ ...prev, amount: value }));
+                    setError(null);
+                  }}
+                />
+              </div>
+            </div>
+
+            {formData.amount !== undefined && formData.amount < cartTotal && (
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <p className="text-sm text-yellow-700">
+                  Remaining Balance: {formatCurrency(cartTotal - formData.amount)}
+                </p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'cash':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#011627] mb-1">
+                Amount (KES)
+              </label>
+              <input
+                type="text"
+                readOnly
+                className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg"
+                value={formatCurrency(cartTotal)}
+              />
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -343,7 +578,7 @@ export default function SalesEntry() {
             <select
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
               value={formData.paymentMethod}
-              onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as 'cash' | 'mpesa' | 'credit' })}
+              onChange={(e) => setFormData(prev => ({ ...prev, paymentMethod: e.target.value as 'cash' | 'mpesa' | 'credit' }))}
             >
               <option value="cash">{t('salesEntry.payment.methods.cash')}</option>
               <option value="mpesa">{t('salesEntry.payment.methods.mpesa')}</option>
@@ -367,6 +602,7 @@ export default function SalesEntry() {
           )}
         </div>
 
+        {renderPaymentFields()}
         {formData.paymentMethod === 'credit' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
