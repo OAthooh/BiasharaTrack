@@ -1,8 +1,10 @@
 import { TrendingUp, DollarSign, CreditCard, ShoppingBag } from 'lucide-react';
 import { SalesMetrics } from '../../types/sales';
 import { formatCurrency } from '../../utils/formatters';
+import { useTranslation } from 'react-i18next';
 
 export default function SalesInsights() {
+  const { t } = useTranslation();
   // Placeholder data - replace with actual API call
   const metrics: SalesMetrics = {
     dailyRevenue: 0,

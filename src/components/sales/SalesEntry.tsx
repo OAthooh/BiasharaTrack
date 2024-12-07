@@ -5,8 +5,10 @@ import { Product } from '../../types/inventory';
 import { formatCurrency } from '../../utils/formatters';
 import { useDebounce } from '../../hooks/useDebounce';
 import { inventoryApi } from '../../utils/api';
+import { useTranslation } from 'react-i18next';
 
 export default function SalesEntry() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<SaleFormData>({
     products: [],
     paymentMethod: 'cash',
@@ -151,7 +153,7 @@ export default function SalesEntry() {
       console.log('Submitting sale data:', saleData);
       const response = await inventoryApi.recordSale(saleData);
       if (response.success) {
-        setSuccess('Sale recorded successfully!');
+        setSuccess(t('salesEntry.messages.success'));
         setFormData({
           products: [],
           paymentMethod: 'cash',
@@ -162,10 +164,10 @@ export default function SalesEntry() {
         setSelectedProducts([]);
         setCartTotal(0);
       } else {
-        setError('Failed to record sale. Please try again.');
+        setError(t('salesEntry.messages.error'));
       }
     } catch (error) {
-      setError('Failed to record sale. Please try again.');
+      setError(t('salesEntry.messages.error'));
     }
   };
 
@@ -197,11 +199,11 @@ export default function SalesEntry() {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="text-sm text-gray-500 mb-4">
-        <span className="font-medium">Keyboard shortcuts:</span>
-        <span className="ml-2">Ctrl+F: Focus search</span>
-        <span className="ml-2">Ctrl+B: Barcode mode</span>
+        <span className="font-medium">{t('salesEntry.shortcuts.title')}</span>
+        <span className="ml-2">Ctrl+F: {t('salesEntry.shortcuts.focusSearch')}</span>
+        <span className="ml-2">Ctrl+B: {t('salesEntry.shortcuts.barcodeMode')}</span>
       </div>
-      <h2 className="text-xl font-semibold text-[#011627] mb-4">Record New Sale</h2>
+      <h2 className="text-xl font-semibold text-[#011627] mb-4">{t('salesEntry.title')}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="bg-red-50 text-red-500 p-3 rounded-lg flex items-center">
@@ -222,13 +224,13 @@ export default function SalesEntry() {
             <input
               type="text"
               className="w-full p-2 border-none focus:ring-0"
-              placeholder="Search by product name, SKU, or barcode"
+              placeholder={t('salesEntry.search.placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          {isSearching && <div className="text-gray-500">Searching...</div>}
+          {isSearching && <div className="text-gray-500">{t('salesEntry.search.searching')}</div>}
           {searchResults.length > 0 && (
             <div
               ref={searchResultsRef}
@@ -252,14 +254,14 @@ export default function SalesEntry() {
                       )}
                       <div>
                         <div className="font-medium">{product.name}</div>
-                        <div className="text-sm text-gray-500">Category: {product.category}</div>
-                        <div className="text-sm text-gray-500">Barcode: {product.barcode}</div>
+                        <div className="text-sm text-gray-500">{t('salesEntry.product.category')}: {product.category}</div>
+                        <div className="text-sm text-gray-500">{t('salesEntry.product.barcode')}: {product.barcode}</div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="font-medium text-green-600">{formatCurrency(product.price)}</div>
                       {product.quantity !== undefined && (
-                        <div className="text-sm text-gray-500">Stock: {product.quantity}</div>
+                        <div className="text-sm text-gray-500">{t('salesEntry.product.stock')}: {product.quantity}</div>
                       )}
                     </div>
                   </div>
@@ -274,11 +276,11 @@ export default function SalesEntry() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Price</th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('salesEntry.table.product')}</th>
+                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">{t('salesEntry.table.quantity')}</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">{t('salesEntry.table.price')}</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">{t('salesEntry.table.subtotal')}</th>
+                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">{t('salesEntry.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -324,7 +326,7 @@ export default function SalesEntry() {
                   );
                 })}
                 <tr className="bg-gray-50 font-semibold">
-                  <td colSpan={3} className="px-4 py-2 text-right">Total:</td>
+                  <td colSpan={3} className="px-4 py-2 text-right">{t('salesEntry.table.total')}:</td>
                   <td className="px-4 py-2 text-right">{formatCurrency(cartTotal)}</td>
                   <td></td>
                 </tr>
@@ -336,23 +338,23 @@ export default function SalesEntry() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-[#011627] mb-1">
-              Payment Method
+            {t('salesEntry.payment.method')}
             </label>
             <select
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
               value={formData.paymentMethod}
               onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as 'cash' | 'mpesa' | 'credit' })}
             >
-              <option value="cash">Cash</option>
-              <option value="mpesa">M-PESA</option>
-              <option value="credit">Credit</option>
+              <option value="cash">{t('salesEntry.payment.methods.cash')}</option>
+              <option value="mpesa">{t('salesEntry.payment.methods.mpesa')}</option>
+              <option value="credit">{t('salesEntry.payment.methods.credit')}</option>
             </select>
           </div>
 
           {formData.paymentMethod === 'mpesa' && (
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
-                M-PESA Transaction Reference
+              {t('salesEntry.payment.mpesaRef')}
               </label>
               <input
                 type="text"
@@ -369,7 +371,7 @@ export default function SalesEntry() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
-                Customer Name
+              {t('salesEntry.customer.name')}
               </label>
               <input
                 type="text"
@@ -381,7 +383,7 @@ export default function SalesEntry() {
             </div>
             <div>
               <label className="block text-sm font-medium text-[#011627] mb-1">
-                Customer Phone
+              {t('salesEntry.customer.phone')}
               </label>
               <input
                 type="tel"
@@ -412,7 +414,7 @@ export default function SalesEntry() {
           type="submit"
           className="w-full bg-[#E71D36] text-white py-2 px-4 rounded-lg hover:bg-[#c91126] transition-colors flex items-center justify-center"
         >
-          Complete Sale
+          {t('salesEntry.buttons.completeSale')}
         </button>
       </form>
     </div>

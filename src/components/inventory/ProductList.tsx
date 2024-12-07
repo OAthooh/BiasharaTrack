@@ -129,7 +129,7 @@ export default function ProductList() {
               {t('inventory.productList.tableHeaders.quantity')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {t('inventoryproductList..tableHeaders.price')}
+              {t('inventory.productList.tableHeaders.price')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               {t('inventory.productList.tableHeaders.lastUpdated')}
