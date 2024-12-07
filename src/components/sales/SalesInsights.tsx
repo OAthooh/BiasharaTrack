@@ -20,31 +20,33 @@ export default function SalesInsights() {
 
   const stats = [
     {
-      name: 'Daily Revenue',
+      name: t('salesInsights.metrics.dailyRevenue'),
       value: formatCurrency(metrics.dailyRevenue),
       icon: DollarSign,
       change: '+4.75%',
       changeType: 'increase',
     },
     {
-      name: 'Weekly Revenue',
+      name: t('salesInsights.metrics.weeklyRevenue'),
       value: formatCurrency(metrics.weeklyRevenue),
       icon: TrendingUp,
       change: '+54.02%',
       changeType: 'increase',
     },
     {
-      name: 'Monthly Revenue',
+      name: t('salesInsights.metrics.monthlyRevenue'),
       value: formatCurrency(metrics.monthlyRevenue),
       icon: CreditCard,
       change: '+12.25%',
       changeType: 'increase',
     },
     {
-      name: 'Top Product',
+      name: t('salesInsights.metrics.topProduct'),
       value: metrics.topProducts[0]?.productName || 'N/A',
       icon: ShoppingBag,
-      change: `${metrics.topProducts[0]?.quantity || 0} units`,
+      change: metrics.topProducts[0]?.quantity 
+        ? `${metrics.topProducts[0].quantity} ${t('salesInsights.units')}`
+        : t('salesInsights.units') + ' 0',
       changeType: 'neutral',
     },
   ];
